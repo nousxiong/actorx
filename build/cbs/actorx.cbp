@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="actorx" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/actorx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-std=c++11" />
+					<Add option="-m64" />
+					<Add option="-g" />
+					<Add directory="../../../actorx/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-lws2_32" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/actorx" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-std=c++11" />
+					<Add option="-m64" />
+					<Add option="-Wno-unused-variable" />
+					<Add directory="../../../actorx/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+					<Add option="-lws2_32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="../../include/asev/affix_base.hpp" />
+		<Unit filename="../../include/asev/all.hpp" />
+		<Unit filename="../../include/asev/config.hpp" />
+		<Unit filename="../../include/asev/corctx.hpp" />
+		<Unit filename="../../include/asev/detail/basic_corctx.hpp" />
+		<Unit filename="../../include/asev/detail/basic_strand.hpp" />
+		<Unit filename="../../include/asev/detail/basic_thrctx.hpp" />
+		<Unit filename="../../include/asev/detail/post_event.hpp" />
+		<Unit filename="../../include/asev/detail/spawn_event.hpp" />
+		<Unit filename="../../include/asev/detail/texit_event.hpp" />
+		<Unit filename="../../include/asev/detail/tstart_event.hpp" />
+		<Unit filename="../../include/asev/detail/worker.hpp" />
+		<Unit filename="../../include/asev/eout.hpp" />
+		<Unit filename="../../include/asev/ev_service.hpp" />
+		<Unit filename="../../include/asev/event_base.hpp" />
+		<Unit filename="../../include/asev/strand.hpp" />
+		<Unit filename="../../include/asev/thrctx.hpp" />
+		<Unit filename="../../include/asev/threv_base.hpp" />
+		<Unit filename="../../include/cque/all.hpp" />
+		<Unit filename="../../include/cque/config.hpp" />
+		<Unit filename="../../include/cque/freer_base.hpp" />
+		<Unit filename="../../include/cque/mpsc_count.hpp" />
+		<Unit filename="../../include/cque/mpsc_pool.hpp" />
+		<Unit filename="../../include/cque/mpsc_queue.hpp" />
+		<Unit filename="../../include/cque/node.hpp" />
+		<Unit filename="../../include/cque/node_base.hpp" />
+		<Unit filename="../../include/cque/pool_base.hpp" />
+		<Unit filename="../../include/cque/queue.hpp" />
+		<Unit filename="../../include/cque/variant_ptr.hpp" />
+		<Unit filename="../../libs/test/test_eout.cpp" />
+		<Unit filename="../../libs/test/test_main.cpp" />
+		<Unit filename="../../libs/test/test_mpsc_count.cpp" />
+		<Unit filename="../../libs/test/test_mpsc_queue.cpp" />
+		<Unit filename="../../libs/test/test_pingpong.cpp" />
+		<Unit filename="../../libs/test/test_queue.cpp" />
+		<Unit filename="../../libs/test/test_spawn.cpp" />
+		<Unit filename="../../libs/test/test_strand.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -336,12 +336,37 @@ public:
                 }
               });
 
+            /// Poll loop sleep duration.
+            std::chrono::microseconds const poll_sleep_dur{50};
+
             /// Work loop.
             while (!thrdat.is_stop())
             {
               try
               {
+                /// First try aggressive polling.
+                for (size_t i=0; i<100; ++i)
+                {
+                  if (thrdat.cnt_.reset() > 0)
+                  {
+                    goto do_job;
+                  }
+                }
+
+                /// Then moderate polling.
+                for (size_t i=0; i<500; ++i)
+                {
+                  if (thrdat.cnt_.reset() > 0 || thrdat.is_stop())
+                  {
+                    goto do_job;
+                  }
+                  std::this_thread::sleep_for(poll_sleep_dur);
+                }
+
+                /// Finally waiting notify.
                 thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
+
+              do_job:
                 if (thrdat.is_stop())
                 {
                   break;

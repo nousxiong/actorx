@@ -21,13 +21,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\libs\test\test_eout.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\libs\test\test_main.cpp">
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\libs\test\test_strand.cpp">
+      <Filter>Source Files\libs\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\test\test_coctx.cpp">
+      <Filter>Source Files\libs\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\test\test_eout.cpp">
+      <Filter>Source Files\libs\test</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\libs\test\test_mpsc_count.cpp">
+      <Filter>Source Files\libs\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libs\test\test_mpsc_queue.cpp">
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\test\test_pingpong.cpp">
@@ -37,12 +46,6 @@
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
     <ClCompile Include="..\..\libs\test\test_spawn.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_mpsc_queue.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_strand.cpp">
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
   </ItemGroup>

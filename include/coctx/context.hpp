@@ -5,6 +5,10 @@
 #pragma once
 
 #include <coctx/config.hpp>
+#include <coctx/stack_size.hpp>
+#ifndef COCTX_WINDOWS
+# include <coctx/detail/posix.hpp>
+#endif // COCTX_WINDOWS
 
 #include <functional>
 #include <system_error>
@@ -12,38 +16,6 @@
 
 namespace coctx
 {
-/// Coroutine stack size.
-struct stack_size
-{
-  size_t size() const
-  {
-    return size_;
-  }
-
-private:
-  size_t size_;
-  friend stack_size make_stacksize(size_t);
-};
-
-/// Make stack size.
-/**
- * @param size User given size, 0~max.
- * @return An stack_size struct, with fixed size.
- */
-inline stack_size make_stacksize(size_t size = 0)
-{
-  stack_size ssize;
-#if defined(COCTX_WINDOWS)
-  /// On windows using fiber, and fiber stack size must be multiples of 64k(SYSTEM_INFO.dwAllocationGranularity)
-  size_t constexpr alloc_granularity = 64 * 1024;
-  ssize.size_ = (size / alloc_granularity + 1) * alloc_granularity;
-#else
-  size_t constexpr min_size = 64 * 1024;
-  ssize.size_ = (std::max)(min_size, size);
-#endif // defined
-  return ssize;
-}
-
 /// Coroutine's context.
 class context
 {
@@ -56,25 +28,29 @@ class context
 
 public:
   context()
+    : ssize_(0)
 #ifdef COCTX_WINDOWS
-    : fiber_(nullptr)
-#endif // COCTX_WINDOWS
     , null_(true)
+    , fiber_(nullptr)
+#endif // COCTX_WINDOWS
   {
   }
 
   template <typename F>
-  context(F&& f, stack_size ssize = make_stacksize())
+  context(F f, stack_size ssize = make_stacksize())
     : ssize_(ssize.size())
 #ifdef COCTX_WINDOWS
+    , null_(false)
 # if _WIN32_WINNT >= 0x0502
     , fiber_(CreateFiberEx(0, ssize_, FIBER_FLAG_FLOAT_SWITCH, context::run_fiber, this))
 # else
     , fiber_(CreateFiber(ssize_, context::run_fiber, this))
 # endif
+#else
+    , stk_(ssize_)
+    , asmctx_(detail::make_coctx(stk_, context::run_asm, this))
 #endif
-    , hdr_(f)
-    , null_(false)
+    , hdr_(std::forward<F>(f))
   {
 #ifdef COCTX_WINDOWS
     if (fiber_ == nullptr)
@@ -122,6 +98,8 @@ public:
       }
     }
     SwitchToFiber(to_ctx.fiber_);
+#else
+    coctx_transfer(&asmctx_, &to_ctx.asmctx_);
 #endif // COCTX_WINDOWS
   }
 
@@ -132,14 +110,24 @@ private:
     auto self = (context*)arg;
     self->hdr_(*self);
   }
+#else
+  static void run_asm(void* arg)
+  {
+    auto self = (context*)arg;
+    self->hdr_(*self);
+  }
 #endif
 
 private:
   size_t ssize_;
 #ifdef COCTX_WINDOWS
+  bool null_;
   gsl::owner<void*> fiber_;
+#else
+  /// must be at offset 0.
+  detail::stack stk_;
+  coctx_asmctx asmctx_;
 #endif
   handler_t hdr_;
-  bool null_;
 };
 } /// namespace coctx

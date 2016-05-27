@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\libs\test\test_coctx.cpp" />
     <ClCompile Include="..\..\libs\test\test_eout.cpp" />
     <ClCompile Include="..\..\libs\test\test_main.cpp" />
     <ClCompile Include="..\..\libs\test\test_mpsc_count.cpp" />

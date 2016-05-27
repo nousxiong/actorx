@@ -182,7 +182,7 @@ private:
 
   size_t pri_reset() noexcept
   {
-    return count_.exchange(0, std::memory_order_consume);
+    return count_.exchange(0, std::memory_order_acquire);
   }
 
   void pri_incr() noexcept

@@ -644,7 +644,7 @@ private:
     auto e = get_cache();
     if (e == nullptr)
     {
-      e = head_.exchange(nullptr, std::memory_order_consume);
+      e = head_.exchange(nullptr, std::memory_order_acquire);
       if (e != nullptr && e->get_next() != nullptr)
       {
         /// reverse

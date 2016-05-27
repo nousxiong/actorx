@@ -88,7 +88,7 @@ private:
     auto n = get_cache();
     if (n == nullptr)
     {
-      n = head_.exchange(nullptr, std::memory_order_consume);
+      n = head_.exchange(nullptr, std::memory_order_acquire);
       if (n != nullptr && n->get_next() != nullptr)
       {
         set_cache(n->get_next());

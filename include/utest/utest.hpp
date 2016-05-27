@@ -24,19 +24,10 @@ struct ucase
 class context
 {
 public:
-  static context* instance(bool del = false)
+  static context* instance()
   {
-    static thread_local gsl::owner<context*> ctx = nullptr;
-    if (ctx == nullptr)
-    {
-      ctx = new context;
-    }
-
-    if (del)
-    {
-      delete ctx;
-    }
-    return ctx;
+    static context ctx;
+    return &ctx;
   }
 
   template <typename F>
@@ -145,7 +136,6 @@ struct auto_reg
   int main() \
   { \
     auto ctx = utest::context::instance(); \
-    auto _ = gsl::finally([](){utest::context::instance(true);}); \
     ctx->run(); \
     return 0; \
   }

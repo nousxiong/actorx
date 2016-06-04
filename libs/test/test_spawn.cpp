@@ -2,7 +2,7 @@
 /// Test spawn.
 ///
 
-#include <utest/utest.hpp>
+#include <actorx/utest/utest.hpp>
 
 #ifdef _WIN32
 # ifndef _WIN32_WINNT
@@ -13,7 +13,7 @@
 #include <asio.hpp>
 #include <asio/system_timer.hpp>
 
-#include <asev/all.hpp>
+#include <actorx/asev/all.hpp>
 
 #include <chrono>
 #include <thread>

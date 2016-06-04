@@ -19,34 +19,39 @@
     <Filter Include="Source Files\libs\test">
       <UniqueIdentifier>{402e48ac-88d1-4c58-9ecc-f07c95427560}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\csegv">
+      <UniqueIdentifier>{8223e954-1f85-4bd2-872d-0e30ca0fd380}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\csegv\detail">
+      <UniqueIdentifier>{bc6a26c5-37ae-43ec-af60-40f6c8d80397}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\libs\test\test_main.cpp">
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_strand.cpp">
+    <ClCompile Include="..\..\libs\test\test_csegv.cpp">
       <Filter>Source Files\libs\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_coctx.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_eout.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_mpsc_count.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_mpsc_queue.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_pingpong.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_queue.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\libs\test\test_spawn.cpp">
-      <Filter>Source Files\libs\test</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\csegv\all.hpp">
+      <Filter>Header Files\csegv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\csegv\config.hpp">
+      <Filter>Header Files\csegv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\csegv\csegv.hpp">
+      <Filter>Header Files\csegv</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\csegv\detail\stack.hpp">
+      <Filter>Header Files\csegv\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\csegv\detail\windows.hpp">
+      <Filter>Header Files\csegv\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\csegv\detail\posix.hpp">
+      <Filter>Header Files\csegv\detail</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

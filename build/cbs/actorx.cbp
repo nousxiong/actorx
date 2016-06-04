@@ -78,16 +78,15 @@
 		<Unit filename="../../include/cque/pool_base.hpp" />
 		<Unit filename="../../include/cque/queue.hpp" />
 		<Unit filename="../../include/cque/variant_ptr.hpp" />
+		<Unit filename="../../include/csegv/all.hpp" />
+		<Unit filename="../../include/csegv/config.hpp" />
+		<Unit filename="../../include/csegv/csegv.hpp" />
+		<Unit filename="../../include/csegv/detail/posix.hpp" />
+		<Unit filename="../../include/csegv/detail/stack.hpp" />
+		<Unit filename="../../include/csegv/detail/windows.hpp" />
 		<Unit filename="../../include/utest/utest.hpp" />
-		<Unit filename="../../libs/test/test_coctx.cpp" />
-		<Unit filename="../../libs/test/test_eout.cpp" />
 		<Unit filename="../../libs/test/test_main.cpp" />
-		<Unit filename="../../libs/test/test_mpsc_count.cpp" />
-		<Unit filename="../../libs/test/test_mpsc_queue.cpp" />
-		<Unit filename="../../libs/test/test_pingpong.cpp" />
-		<Unit filename="../../libs/test/test_queue.cpp" />
 		<Unit filename="../../libs/test/test_spawn.cpp" />
-		<Unit filename="../../libs/test/test_strand.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

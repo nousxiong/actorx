@@ -15,7 +15,7 @@
 					<Add option="-std=c++11" />
 					<Add option="-m32" />
 					<Add option="-g" />
-					<Add directory="../../../actorx/include" />
+					<Add directory="../../../actorx" />
 				</Compiler>
 				<Linker>
 					<Add option="-m32" />
@@ -32,7 +32,7 @@
 					<Add option="-std=c++11" />
 					<Add option="-m64" />
 					<Add option="-Wno-unused-variable" />
-					<Add directory="../../../actorx/include" />
+					<Add directory="../../../actorx" />
 				</Compiler>
 				<Linker>
 					<Add option="-m64" />
@@ -44,47 +44,47 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="../../include/asev/affix_base.hpp" />
-		<Unit filename="../../include/asev/all.hpp" />
-		<Unit filename="../../include/asev/config.hpp" />
-		<Unit filename="../../include/asev/corctx.hpp" />
-		<Unit filename="../../include/asev/detail/basic_corctx.hpp" />
-		<Unit filename="../../include/asev/detail/basic_strand.hpp" />
-		<Unit filename="../../include/asev/detail/basic_thrctx.hpp" />
-		<Unit filename="../../include/asev/detail/post_event.hpp" />
-		<Unit filename="../../include/asev/detail/spawn_event.hpp" />
-		<Unit filename="../../include/asev/detail/texit_event.hpp" />
-		<Unit filename="../../include/asev/detail/tstart_event.hpp" />
-		<Unit filename="../../include/asev/detail/worker.hpp" />
-		<Unit filename="../../include/asev/eout.hpp" />
-		<Unit filename="../../include/asev/ev_service.hpp" />
-		<Unit filename="../../include/asev/event_base.hpp" />
-		<Unit filename="../../include/asev/strand.hpp" />
-		<Unit filename="../../include/asev/thrctx.hpp" />
-		<Unit filename="../../include/asev/threv_base.hpp" />
-		<Unit filename="../../include/coctx/all.hpp" />
-		<Unit filename="../../include/coctx/config.hpp" />
-		<Unit filename="../../include/coctx/context.hpp" />
-		<Unit filename="../../include/coctx/detail/posix.hpp" />
-		<Unit filename="../../include/coctx/stack_size.hpp" />
-		<Unit filename="../../include/cque/all.hpp" />
-		<Unit filename="../../include/cque/config.hpp" />
-		<Unit filename="../../include/cque/freer_base.hpp" />
-		<Unit filename="../../include/cque/mpsc_count.hpp" />
-		<Unit filename="../../include/cque/mpsc_pool.hpp" />
-		<Unit filename="../../include/cque/mpsc_queue.hpp" />
-		<Unit filename="../../include/cque/node.hpp" />
-		<Unit filename="../../include/cque/node_base.hpp" />
-		<Unit filename="../../include/cque/pool_base.hpp" />
-		<Unit filename="../../include/cque/queue.hpp" />
-		<Unit filename="../../include/cque/variant_ptr.hpp" />
-		<Unit filename="../../include/csegv/all.hpp" />
-		<Unit filename="../../include/csegv/config.hpp" />
-		<Unit filename="../../include/csegv/csegv.hpp" />
-		<Unit filename="../../include/csegv/detail/posix.hpp" />
-		<Unit filename="../../include/csegv/detail/stack.hpp" />
-		<Unit filename="../../include/csegv/detail/windows.hpp" />
-		<Unit filename="../../include/utest/utest.hpp" />
+		<Unit filename="../../actorx/asev/affix_base.hpp" />
+		<Unit filename="../../actorx/asev/all.hpp" />
+		<Unit filename="../../actorx/asev/config.hpp" />
+		<Unit filename="../../actorx/asev/corctx.hpp" />
+		<Unit filename="../../actorx/asev/detail/basic_corctx.hpp" />
+		<Unit filename="../../actorx/asev/detail/basic_strand.hpp" />
+		<Unit filename="../../actorx/asev/detail/basic_thrctx.hpp" />
+		<Unit filename="../../actorx/asev/detail/post_event.hpp" />
+		<Unit filename="../../actorx/asev/detail/spawn_event.hpp" />
+		<Unit filename="../../actorx/asev/detail/texit_event.hpp" />
+		<Unit filename="../../actorx/asev/detail/tstart_event.hpp" />
+		<Unit filename="../../actorx/asev/detail/worker.hpp" />
+		<Unit filename="../../actorx/asev/eout.hpp" />
+		<Unit filename="../../actorx/asev/ev_service.hpp" />
+		<Unit filename="../../actorx/asev/event_base.hpp" />
+		<Unit filename="../../actorx/asev/strand.hpp" />
+		<Unit filename="../../actorx/asev/thrctx.hpp" />
+		<Unit filename="../../actorx/asev/threv_base.hpp" />
+		<Unit filename="../../actorx/coctx/all.hpp" />
+		<Unit filename="../../actorx/coctx/config.hpp" />
+		<Unit filename="../../actorx/coctx/context.hpp" />
+		<Unit filename="../../actorx/coctx/detail/posix.hpp" />
+		<Unit filename="../../actorx/coctx/stack_size.hpp" />
+		<Unit filename="../../actorx/cque/all.hpp" />
+		<Unit filename="../../actorx/cque/config.hpp" />
+		<Unit filename="../../actorx/cque/freer_base.hpp" />
+		<Unit filename="../../actorx/cque/mpsc_count.hpp" />
+		<Unit filename="../../actorx/cque/mpsc_pool.hpp" />
+		<Unit filename="../../actorx/cque/mpsc_queue.hpp" />
+		<Unit filename="../../actorx/cque/node.hpp" />
+		<Unit filename="../../actorx/cque/node_base.hpp" />
+		<Unit filename="../../actorx/cque/pool_base.hpp" />
+		<Unit filename="../../actorx/cque/queue.hpp" />
+		<Unit filename="../../actorx/cque/variant_ptr.hpp" />
+		<Unit filename="../../actorx/csegv/all.hpp" />
+		<Unit filename="../../actorx/csegv/config.hpp" />
+		<Unit filename="../../actorx/csegv/csegv.hpp" />
+		<Unit filename="../../actorx/csegv/detail/posix.hpp" />
+		<Unit filename="../../actorx/csegv/detail/stack.hpp" />
+		<Unit filename="../../actorx/csegv/detail/windows.hpp" />
+		<Unit filename="../../actorx/utest/utest.hpp" />
 		<Unit filename="../../libs/test/test_main.cpp" />
 		<Unit filename="../../libs/test/test_spawn.cpp" />
 		<Extensions>

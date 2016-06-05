@@ -2,9 +2,9 @@
 /// Test pingpong.
 ///
 
-#include <utest/utest.hpp>
+#include <actorx/utest/utest.hpp>
 
-#include <asev/all.hpp>
+#include <actorx/asev/all.hpp>
 
 #include <chrono>
 #include <thread>

@@ -8,6 +8,8 @@
 #include "actorx/coctx/stack_size.hpp"
 #ifndef COCTX_WINDOWS
 # include "actorx/coctx/detail/posix.hpp"
+#else
+# include <windows.h>
 #endif // COCTX_WINDOWS
 
 #include <functional>

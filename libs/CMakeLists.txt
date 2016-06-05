@@ -14,6 +14,10 @@ if (UNIX)
   set (LINK_LIBS ${LINK_LIBS} dl)
 elseif (WIN32)
   set (LINK_LIBS ${LINK_LIBS} Dbghelp)
+  if (NOT MSVC)
+    # MinGW for link ws2_32.
+    set (LINK_LIBS ${LINK_LIBS} ws2_32)
+  endif ()
 endif ()
 
 # Not only x64 linux need this, but all linux gcc, we need this.

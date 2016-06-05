@@ -12,6 +12,9 @@
 cmake_minimum_required (VERSION 3.0.0 FATAL_ERROR)
 project (actorx)
 
+# Set -std=c++11.
+set(CMAKE_CXX_STANDARD 11)
+
 # Provide user options to customise the build process.
 option (ACTORX_DEV "Actorx dev mode" OFF)
 option (ACTORX_BUILD_EXAMPLE "Build Actorx examples" OFF)

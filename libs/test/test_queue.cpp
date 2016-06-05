@@ -2,9 +2,9 @@
 /// Test queue.
 ///
 
-#include <utest/utest.hpp>
+#include <actorx/utest/utest.hpp>
 
-#include <cque/all.hpp>
+#include <actorx/cque/all.hpp>
 
 #include <chrono>
 #include <thread>

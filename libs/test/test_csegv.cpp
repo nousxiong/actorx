@@ -2,9 +2,9 @@
 /// Test csegv.
 ///
 
-#include <utest/utest.hpp>
+#include <actorx/utest/utest.hpp>
 
-#include <csegv/all.hpp>
+#include <actorx/csegv/all.hpp>
 
 #include <thread>
 #include <chrono>

@@ -180,7 +180,7 @@ static void signal_filter(context& ctx)
 # endif
       auto stk =
         detail::get_stack_list(
-         (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
+          (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
           (void*)ucontext->uc_mcontext.gregs[reg_ip], stack_depth, 0, true, true
         );
 

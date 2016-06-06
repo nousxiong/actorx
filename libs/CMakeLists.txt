@@ -21,15 +21,13 @@ elseif (WIN32)
 endif ()
 
 # Not only x64 linux need this, but all linux gcc, we need this.
-if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
+if (CMAKE_COMPILER_IS_GNUCXX)
   add_definitions (-fPIC)
 endif ()
 
 if (ACTORX_DEV)
   # Set up all files.
-  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/include/*.hpp")
-  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/include/*.ipp")
-  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/include/*.h")
+  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/include/actorx/*.hpp")
   file (GLOB_RECURSE ACTORX_SOURCE_FILES "${PROJECT_SOURCE_DIR}/libs/src/src.cpp")
 
   # Actorx library for dev

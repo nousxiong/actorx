@@ -9,7 +9,7 @@
 # See https://github.com/nousxiong/actorx for latest version.
 #
 
-cmake_minimum_required (VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.1.0 FATAL_ERROR)
 project (actorx)
 
 # Set -std=c++11.
@@ -60,7 +60,7 @@ if (WIN32)
   endif ()
 endif ()
 
-add_subdirectory (libs/${SUB_LIB_NAME})
+add_subdirectory (libs)
 
 # Configure a header file to pass some of the CMake settings to the source code.
 configure_file (

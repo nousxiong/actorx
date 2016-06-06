@@ -156,8 +156,6 @@ static void signal_filter(context& ctx)
     return;
   }
 
-  auto stack_depth = max_stack_depth();
-
   stack_t sigaltStack;
   sigaltStack.ss_size = ctx.size_;
   sigaltStack.ss_sp = ctx.stack_;
@@ -171,6 +169,7 @@ static void signal_filter(context& ctx)
   sigact.sa_sigaction =
     [](int signum, siginfo_t* info, void* ptr)
     {
+      auto stack_depth = max_stack_depth();
       auto ucontext = (ucontext_t*)ptr;
 # ifdef REG_RIP
       auto reg_bp = REG_RBP;
@@ -181,7 +180,7 @@ static void signal_filter(context& ctx)
 # endif
       auto stk =
         detail::get_stack_list(
-        (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
+         (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
           (void*)ucontext->uc_mcontext.gregs[reg_ip], stack_depth, 0, true, true
         );
 

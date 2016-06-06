@@ -12,13 +12,15 @@
 #include <iostream>
 
 
+#ifdef ACTORX_TEST_CSEGV
+
 void badass()
 {
   char* v = (char*)42;
   *v = 42;
 }
 
-UTEST_CASE_SEQ(50, test_csegv)
+UTEST_CASE_FINAL(10000, test_csegv)
 {
   csegv::init();
 
@@ -37,3 +39,5 @@ UTEST_CASE_SEQ(50, test_csegv)
   thr.join();
   std::cout << "done." << std::endl;
 }
+
+#endif

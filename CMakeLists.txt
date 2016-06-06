@@ -19,9 +19,12 @@ set(CMAKE_CXX_STANDARD 11)
 option (ACTORX_DEV "Actorx dev mode" OFF)
 option (ACTORX_BUILD_EXAMPLE "Build Actorx examples" OFF)
 option (ACTORX_BUILD_TEST "Build Actorx tests" OFF)
+option (ACTORX_TEST_CSEGV "Test csegv" OFF)
 if (UNIX)
   option (ACTORX_STATIC "Build Actorx runtime static" OFF)
 endif ()
+
+mark_as_advanced (ACTORX_TEST_CSEGV)
 
 if (WIN32)
   set (ACTORX_WINVER "0x0700" CACHE STRING "Windows version maro. Default is 0x0700 - win7, user can reset")

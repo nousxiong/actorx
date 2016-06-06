@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "actorx/user.hpp"
+
 #include <gsl.h>
 
 

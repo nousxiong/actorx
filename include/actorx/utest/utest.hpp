@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "actorx/user.hpp"
+
 #include <gsl.h>
 
 #include <thread>
@@ -41,18 +43,12 @@ public:
   }
 
   template <typename F>
-  void add_case(int priority, std::string name, F f)
+  void add_case(int priority, std::string name, F f, bool is_final)
   {
-    ucase uc;
-    uc.name_ = name;
-    uc.f_ = std::move(f);
-    auto pr = seq_case_list_.emplace(priority, std::move(uc));
-    if (!pr.second)
-    {
-      std::cerr << "case " << name << " with priority: " <<
-        priority << ", repeat with case " << pr.first->second.name_ << std::endl;
-      std::terminate();
-    }
+    pri_add_case(
+      is_final ? final_case_list_ : seq_case_list_,
+      priority, std::move(name), std::forward<F>(f)
+      );
   }
 
   void run()
@@ -71,6 +67,11 @@ public:
     for (auto const& c : case_list_)
     {
       run_case(c);
+    }
+
+    for (auto const& cpr : final_case_list_)
+    {
+      run_case(cpr.second);
     }
   }
 
@@ -93,9 +94,28 @@ private:
     return except;
   }
 
+  template <typename F>
+  static void pri_add_case(
+    std::map<int, ucase>& case_list,
+    int priority, std::string name, F f
+    )
+  {
+    ucase uc;
+    uc.name_ = name;
+    uc.f_ = std::move(f);
+    auto pr = case_list.emplace(priority, std::move(uc));
+    if (!pr.second)
+    {
+      std::cerr << "case " << name << " with priority: " <<
+        priority << ", repeat with case " << pr.first->second.name_ << std::endl;
+      std::terminate();
+    }
+  }
+
 private:
   std::map<int, ucase> seq_case_list_;
   std::list<ucase> case_list_;
+  std::map<int, ucase> final_case_list_;
 };
 
 struct auto_reg
@@ -108,10 +128,10 @@ struct auto_reg
   }
 
   template <typename F>
-  auto_reg(int priority, std::string name, F f)
+  auto_reg(int priority, std::string name, F f, bool is_final)
   {
     auto ctx = utest::context::instance();
-    ctx->add_case(priority, std::move(name), std::forward<F>(f));
+    ctx->add_case(priority, std::move(name), std::forward<F>(f), is_final);
   }
 };
 }
@@ -124,13 +144,16 @@ struct auto_reg
   } \
   static void utest_##case_name##_f()
 
-#define UTEST_CASE_SEQ(priority, case_name) \
+#define UTEST_CASE_SEQ_IMPL(priority, case_name, is_final) \
   static void utest_##case_name##_f(); \
   namespace \
   { \
-    utest::auto_reg utest_##case_name##_ar(priority, #case_name, &utest_##case_name##_f); \
+    utest::auto_reg utest_##case_name##_ar(priority, #case_name, &utest_##case_name##_f, is_final); \
   } \
   static void utest_##case_name##_f()
+
+#define UTEST_CASE_SEQ(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, false)
+#define UTEST_CASE_FINAL(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, true)
 
 
 #define UTEST_MAIN \

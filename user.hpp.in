@@ -1,7 +1,7 @@
 ///
 /// user.hpp
-/// 
-/// CMake auto-generated configuration options. 
+///
+/// CMake auto-generated configuration options.
 /// Do not check in modified versions of this file.
 ///
 /// Copyright (c) 2016 Nous Xiong (348944179 at qq dot com)
@@ -19,3 +19,5 @@
 #   define _WIN32_WINNT @ACTORX_WINVER@
 # endif
 #endif
+
+#cmakedefine ACTORX_TEST_CSEGV

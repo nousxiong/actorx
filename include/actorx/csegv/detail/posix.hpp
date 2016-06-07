@@ -124,13 +124,19 @@ static std::list<stack_info> get_stack_list(
   Dl_info dlinfo;
   void* ip = reg_ip;
   void** bp = (void**)reg_bp;
-  while (bp && ip && traceback.size() < stack_depth)
+  while (ip && traceback.size() < stack_depth)
   {
-    if (!dladdr(ip, &dlinfo))
+    if (dladdr(ip, &dlinfo) == 0)
     {
       break;
     }
+
     traceback.push_back(ip);
+    if (!bp)
+    {
+      break;
+    }
+
     ip = bp[1];
     bp = (void**)bp[0];
   }

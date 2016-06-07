@@ -59,43 +59,73 @@ public:
     disabled_list_.insert(std::move(name));
   }
 
-  void run(int loop = 1, std::chrono::milliseconds interval = std::chrono::milliseconds(100))
+  void add_enabled(std::string name)
+  {
+    enabled_list_.insert(std::move(name));
+  }
+
+  void run()
   {
     /// Init csegv.
     csegv::init();
 
+    if (!enabled_list_.empty())
+    {
+      auto seq_case_list = seq_case_list_;
+      seq_case_list_.clear();
+      for (auto& cpr : seq_case_list)
+      {
+        if (enabled_list_.find(cpr.second.name_) != enabled_list_.end())
+        {
+          seq_case_list_.emplace(cpr.first, std::move(cpr.second));
+        }
+      }
+
+      auto case_list = case_list_;
+      case_list_.clear();
+      for (auto& c : case_list_)
+      {
+        if (enabled_list_.find(c.name_) != enabled_list_.end())
+        {
+          case_list_.push_back(std::move(c));
+        }
+      }
+
+      auto final_case_list = final_case_list_;
+      final_case_list_.clear();
+      for (auto& cpr : final_case_list)
+      {
+        if (enabled_list_.find(cpr.second.name_) != enabled_list_.end())
+        {
+          final_case_list_.emplace(cpr.first, std::move(cpr.second));
+        }
+      }
+    }
+
     /// Begin utest loop.
     csegv::pcall(
-      [this, loop, interval]()
+      [this]()
       {
-        for (total_loop_=0; total_loop_<loop; ++total_loop_)
+        for (auto const& cpr : seq_case_list_)
         {
-          for (auto const& cpr : seq_case_list_)
+          if (run_case(cpr.second))
           {
-            if (run_case(cpr.second))
-            {
-              std::cerr << "\n------------------------------------------" << std::endl;
-              std::cerr << "seq case " << cpr.second.name_ << " not pass, others will not be executed!" << std::endl;
-              std::cerr << "------------------------------------------" << std::endl;
-              goto test_end;
-            }
+            std::cerr << "\n------------------------------------------" << std::endl;
+            std::cerr << "seq case " << cpr.second.name_ << " not pass, others will not be executed!" << std::endl;
+            std::cerr << "------------------------------------------" << std::endl;
+            return;
           }
-
-          for (auto const& c : case_list_)
-          {
-            run_case(c);
-          }
-
-          for (auto const& cpr : final_case_list_)
-          {
-            run_case(cpr.second);
-          }
-
-          std::this_thread::sleep_for(interval);
         }
 
-test_end:
-        std::cout << std::endl << "Total utest loop: " << total_loop_ << std::endl;
+        for (auto const& c : case_list_)
+        {
+          run_case(c);
+        }
+
+        for (auto const& cpr : final_case_list_)
+        {
+          run_case(cpr.second);
+        }
       });
   }
 
@@ -146,6 +176,7 @@ private:
   std::list<ucase> case_list_;
   std::map<int, ucase> final_case_list_;
   std::set<std::string> disabled_list_;
+  std::set<std::string> enabled_list_;
   int total_loop_;
 };
 
@@ -166,16 +197,26 @@ struct auto_reg
   }
 };
 
-struct auto_unreg
+struct auto_disable
 {
-  explicit auto_unreg(std::string name)
+  explicit auto_disable(std::string name)
   {
     auto ctx = utest::context::instance();
     ctx->add_disabled(std::move(name));
   }
 };
-}
 
+struct auto_enable
+{
+  explicit auto_enable(std::string name)
+  {
+    auto ctx = utest::context::instance();
+    ctx->add_enabled(std::move(name));
+  }
+};
+} /// namespace utest
+
+/// Add an test case named by case_name.
 #define UTEST_CASE(case_name) \
   static void utest_##case_name##_f(); \
   namespace \
@@ -192,22 +233,32 @@ struct auto_unreg
   } \
   static void utest_##case_name##_f()
 
+/// Add an test case with priority, those cases prior all the others.
 #define UTEST_CASE_SEQ(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, false)
+
+/// Add an test case will be run after all the others.
 #define UTEST_CASE_FINAL(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, true)
 
+/// Disable given test case.
 #define UTEST_DISABLE(case_name) \
   namespace \
   { \
-    utest::auto_unreg utest_##case_name##_aur(#case_name); \
+    utest::auto_disable utest_##case_name##_ad(#case_name); \
   }
 
-#define UTEST_MAIN_LOOP(loop, interval) \
+/// When use this macro, all case will be disabled and only this macro's case(s)
+/// BUT not in disabled_list can run.
+#define UTEST_ENABLE(case_name) \
+  namespace \
+  { \
+    utest::auto_enable utest_##case_name##_ae(#case_name); \
+  }
+
+/// User must use this macro in one and only one cpp file.
+#define UTEST_MAIN \
   int main() \
   { \
     auto ctx = utest::context::instance(); \
-    auto iv = std::chrono::milliseconds(interval); \
-    ctx->run(loop, iv); \
+    ctx->run(); \
     return 0; \
   }
-
-#define UTEST_MAIN UTEST_MAIN_LOOP(1, 0)

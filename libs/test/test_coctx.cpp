@@ -43,6 +43,7 @@ void handle(coctx::context& self, coctx::context& main_ctx)
 
 UTEST_CASE(test_coctx)
 {
+  usr::i = 1;
   coctx::context main_ctx;
 
   auto ssize = coctx::make_stacksize();

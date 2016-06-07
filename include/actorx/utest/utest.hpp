@@ -5,11 +5,14 @@
 #pragma once
 
 #include "actorx/user.hpp"
+#include "actorx/csegv/all.hpp"
 
 #include <gsl.h>
 
 #include <thread>
+#include <chrono>
 #include <map>
+#include <set>
 #include <list>
 #include <string>
 #include <iostream>
@@ -51,34 +54,60 @@ public:
       );
   }
 
-  void run()
+  void add_disabled(std::string name)
   {
-    for (auto const& cpr : seq_case_list_)
-    {
-      if (run_case(cpr.second))
+    disabled_list_.insert(std::move(name));
+  }
+
+  void run(int loop = 1, std::chrono::milliseconds interval = std::chrono::milliseconds(100))
+  {
+    /// Init csegv.
+    csegv::init();
+
+    /// Begin utest loop.
+    csegv::pcall(
+      [this, loop, interval]()
       {
-        std::cerr << "\n------------------------------------------" << std::endl;
-        std::cerr << "seq case " << cpr.second.name_ << " not pass, others will not be executed!" << std::endl;
-        std::cerr << "------------------------------------------" << std::endl;
-        return;
-      }
-    }
+        for (total_loop_=0; total_loop_<loop; ++total_loop_)
+        {
+          for (auto const& cpr : seq_case_list_)
+          {
+            if (run_case(cpr.second))
+            {
+              std::cerr << "\n------------------------------------------" << std::endl;
+              std::cerr << "seq case " << cpr.second.name_ << " not pass, others will not be executed!" << std::endl;
+              std::cerr << "------------------------------------------" << std::endl;
+              goto test_end;
+            }
+          }
 
-    for (auto const& c : case_list_)
-    {
-      run_case(c);
-    }
+          for (auto const& c : case_list_)
+          {
+            run_case(c);
+          }
 
-    for (auto const& cpr : final_case_list_)
-    {
-      run_case(cpr.second);
-    }
+          for (auto const& cpr : final_case_list_)
+          {
+            run_case(cpr.second);
+          }
+
+          std::this_thread::sleep_for(interval);
+        }
+
+test_end:
+        std::cout << std::endl << "Total utest loop: " << total_loop_ << std::endl;
+      });
   }
 
 private:
-  static bool run_case(ucase const& c)
+  bool run_case(ucase const& c) noexcept
   {
     bool except = false;
+    if (disabled_list_.find(c.name_) != disabled_list_.end())
+    {
+      return except;
+    }
+
     try
     {
       std::cout << "--------------<" << c.name_ << "> begin--------------" << std::endl;
@@ -116,6 +145,8 @@ private:
   std::map<int, ucase> seq_case_list_;
   std::list<ucase> case_list_;
   std::map<int, ucase> final_case_list_;
+  std::set<std::string> disabled_list_;
+  int total_loop_;
 };
 
 struct auto_reg
@@ -132,6 +163,15 @@ struct auto_reg
   {
     auto ctx = utest::context::instance();
     ctx->add_case(priority, std::move(name), std::forward<F>(f), is_final);
+  }
+};
+
+struct auto_unreg
+{
+  explicit auto_unreg(std::string name)
+  {
+    auto ctx = utest::context::instance();
+    ctx->add_disabled(std::move(name));
   }
 };
 }
@@ -155,11 +195,19 @@ struct auto_reg
 #define UTEST_CASE_SEQ(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, false)
 #define UTEST_CASE_FINAL(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, true)
 
+#define UTEST_DISABLE(case_name) \
+  namespace \
+  { \
+    utest::auto_unreg utest_##case_name##_aur(#case_name); \
+  }
 
-#define UTEST_MAIN \
+#define UTEST_MAIN_LOOP(loop, interval) \
   int main() \
   { \
     auto ctx = utest::context::instance(); \
-    ctx->run(); \
+    auto iv = std::chrono::milliseconds(interval); \
+    ctx->run(loop, iv); \
     return 0; \
   }
+
+#define UTEST_MAIN UTEST_MAIN_LOOP(1, 0)

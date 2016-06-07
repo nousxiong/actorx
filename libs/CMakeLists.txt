@@ -14,14 +14,14 @@ if (UNIX)
   set (LINK_LIBS ${LINK_LIBS} dl)
 elseif (WIN32)
   set (LINK_LIBS ${LINK_LIBS} Dbghelp)
-  if (NOT MSVC)
+  if (MINGW)
     # MinGW for link ws2_32.
     set (LINK_LIBS ${LINK_LIBS} ws2_32)
   endif ()
 endif ()
 
 # Not only x64 linux need this, but all linux gcc, we need this.
-if (CMAKE_COMPILER_IS_GNUCXX)
+if (CMAKE_COMPILER_IS_GNUCXX AND NOT MINGW)
   add_definitions (-fPIC)
 endif ()
 

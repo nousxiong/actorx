@@ -5,6 +5,7 @@
 #pragma once
 
 #include "actorx/csegv/config.hpp"
+#include "actorx/csegv/stack_info.hpp"
 #ifdef _MSC_VER
 # include "actorx/csegv/detail/windows.hpp"
 #elif defined(CSEGV_WINDOWS) /// mingw
@@ -16,10 +17,11 @@
 
 namespace csegv
 {
-static void init(size_t stack_depth = 3, bool brief = true) noexcept
+static void init(size_t stack_depth = 3, bool brief = true, handler_t h = handler_t()) noexcept
 {
   detail::max_stack_depth(stack_depth);
   detail::is_brief_info(brief ? -1 : 1);
+  detail::get_handler(h);
 
 #ifdef _MSC_VER
   HANDLE hProcess = GetCurrentProcess();

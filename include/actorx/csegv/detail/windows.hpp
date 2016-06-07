@@ -217,11 +217,19 @@ static int seh_filter(LPEXCEPTION_POINTERS exinfo)
       );
 #endif
 
-  for (auto& ele : stack_list)
+  auto h = get_handler();
+  if (h)
   {
-    std::cout << ele << std::endl;
+    h(stack_list);
   }
-  std::cout << std::endl << std::flush;
+  else
+  {
+    for (auto& ele : stack_list)
+    {
+      std::cerr << ele << std::endl;
+    }
+    std::cerr << std::endl << std::flush;
+  }
 
   if (ecd == EXCEPTION_ACCESS_VIOLATION)
   {

@@ -178,15 +178,24 @@ static void signal_filter(context& ctx)
       auto reg_bp = REG_EBP;
       auto reg_ip = REG_EIP;
 # endif
-      auto stk =
+      auto stack_list =
         detail::get_stack_list(
           (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
           (void*)ucontext->uc_mcontext.gregs[reg_ip], stack_depth, 0, true, true
         );
 
-      for (auto& ele : stk)
+      auto h = get_handler();
+      if (h)
       {
-        std::cout << ele << std::endl;
+        h(stack_list);
+      }
+      else
+      {
+        for (auto& ele : stack_list)
+        {
+          std::cerr << ele << std::endl;
+        }
+        std::cerr << std::endl << std::flush;
       }
       std::exit(102);
     };

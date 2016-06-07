@@ -5,4 +5,7 @@
 #include <actorx/utest/utest.hpp>
 
 
+//UTEST_DISABLE(test_csegv)
+UTEST_ENABLE(test_csegv)
+
 UTEST_MAIN

@@ -91,4 +91,8 @@ UTEST_CASE(test_spawn)
   thr.join();
 
   std::cout << "done." << std::endl;
+
+#ifdef SPDLOG_DEBUG_ON
+  Ensures(false);
+#endif // SPDLOG_DEBUG_ON
 }

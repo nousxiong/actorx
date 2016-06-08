@@ -5,7 +5,6 @@
 #pragma once
 
 #include "actorx/asev/config.hpp"
-#include "actorx/asev/eout.hpp"
 #include "actorx/asev/detail/worker.hpp"
 #include "actorx/asev/detail/basic_thrctx.hpp"
 #include "actorx/asev/detail/basic_corctx.hpp"
@@ -14,6 +13,9 @@
 #include "actorx/asev/detail/spawn_event.hpp"
 #include "actorx/asev/detail/tstart_event.hpp"
 #include "actorx/asev/detail/texit_event.hpp"
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/null_sink.h>
 
 #include <thread>
 #include <mutex>
@@ -42,6 +44,7 @@ class ev_service
   using texit_handler_t = std::function<void (thrctx_t&)>;
   using uid_t = unsigned int;
   using worker_ptr = std::atomic<detail::worker*>;
+  using logger_ptr = std::shared_ptr<spdlog::logger>;
 
   friend class detail::basic_strand<ev_service>;
   friend class detail::basic_corctx<ev_service>;
@@ -60,14 +63,38 @@ class ev_service
 public:
   explicit ev_service(
     size_t thread_num = std::thread::hardware_concurrency(),
+    logger_ptr logger = logger_ptr(),
     size_t worker_num = 0
     )
     : uid_(0)
+    , logger_(logger)
     , curr_sndidx_(0)
     , stopped_workers_(0)
   {
     static std::atomic_uint evs_uid(0);
     uid_ = evs_uid++;
+
+    if (!logger_)
+    {
+#ifdef ACTORX_DEBUG
+      auto logger = spdlog::get("stdout");
+      if (!logger)
+      {
+        logger = spdlog::stdout_logger_mt("stdout");
+        logger->set_level(spdlog::level::debug);
+        logger->set_pattern("%v");
+      }
+      logger_ = logger;
+#else
+      auto logger = spdlog::get("null_logger");
+      if (!logger)
+      {
+        auto null_sink = std::make_shared<spdlog::sinks::null_sink_mt>();
+        logger = std::make_shared<spdlog::logger>("null_logger", null_sink);
+      }
+      logger_ = logger;
+#endif // ACTORX_DEBUG
+    }
 
     thread_num = thread_num == 0 ? 1 : thread_num;
 
@@ -80,7 +107,7 @@ public:
     /// Make thread data.
     for (size_t i=0; i<thread_num; ++i)
     {
-      thread_data_list_.emplace_back(std::ref(*this), i);
+      thread_data_list_.emplace_back(std::ref(*this), i, logger_);
     }
 
     /// Make workers.
@@ -132,6 +159,7 @@ public:
       }
     }
 
+#ifdef ACTORX_DEBUG
     int64_t tworks = 0;
     int64_t pworks = 0;
     int64_t mworks = 0;
@@ -141,8 +169,8 @@ public:
       mworks += thrdat.mworks_;
       tworks += thrdat.pworks_ + thrdat.mworks_;
     }
-    /// @todo only for test.
-    eout("p: {}, m: {}, t: {}\n", pworks, mworks, tworks);
+    SPDLOG_DEBUG(logger_, "p: {}, m: {}, t: {}\n", pworks, mworks, tworks);
+#endif
   }
 
 public:
@@ -542,6 +570,9 @@ private:
   /// Local process unique id.
   uid_t uid_;
 
+  /// Logger.
+  logger_ptr logger_;
+
   /// Thread local pool.
   struct thread_local_pool : public cque::node_base
   {
@@ -559,8 +590,8 @@ private:
   /// Each thread has a data.
   struct thread_data
   {
-    thread_data(ev_service& evs, size_t index)
-      : thrctx_(new thrctx_t(evs, index))
+    thread_data(ev_service& evs, size_t index, logger_ptr logger)
+      : thrctx_(new thrctx_t(evs, index, std::move(logger)))
       , stop_(false)
     {
       pworks_ = 0;

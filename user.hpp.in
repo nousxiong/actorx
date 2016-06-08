@@ -19,3 +19,5 @@
 #   define _WIN32_WINNT @ACTORX_WINVER@
 # endif
 #endif
+
+#cmakedefine ACTORX_DEBUG

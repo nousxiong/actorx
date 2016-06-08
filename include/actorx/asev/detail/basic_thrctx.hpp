@@ -8,6 +8,8 @@
 #include "actorx/asev/event_base.hpp"
 #include "actorx/asev/affix_base.hpp"
 
+#include <spdlog/spdlog.h>
+
 #include <list>
 #include <memory>
 #include <typeinfo>
@@ -40,11 +42,13 @@ class basic_thrctx
   };
 
   using corctx_t = basic_corctx<EvService>;
+  using logger_ptr = std::shared_ptr<spdlog::logger>;
 
 public:
-  basic_thrctx(EvService& evs, size_t index)
+  basic_thrctx(EvService& evs, size_t index, logger_ptr logger)
     : evs_(evs)
     , index_(index)
+    , logger_(logger)
     , curr_worker_(nullptr)
     , curr_corctx_(nullptr)
     , affix_(nullptr)
@@ -60,6 +64,11 @@ public:
   inline size_t get_index() const noexcept
   {
     return index_;
+  }
+
+  inline logger_ptr get_logger() noexcept
+  {
+    return logger_;
   }
 
   template <typename T>
@@ -121,6 +130,8 @@ public:
 private:
   EvService& evs_;
   size_t index_;
+  logger_ptr logger_;
+
   worker* curr_worker_;
   std::list<event_pool> pool_list_;
   corctx_t* curr_corctx_;

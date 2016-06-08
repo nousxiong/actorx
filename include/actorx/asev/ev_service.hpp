@@ -147,6 +147,18 @@ public:
       }
     }
 
+#ifdef ACTORX_DEBUG
+    int64_t tworks = 0;
+    int64_t pworks = 0;
+    int64_t mworks = 0;
+    for (auto& wkr : worker_list_)
+    {
+      pworks += wkr.get_pworks();
+      mworks += wkr.get_mworks();
+    }
+    tworks += pworks + mworks;
+#endif
+
     workshop_.clear();
     worker_list_.clear();
 
@@ -160,15 +172,6 @@ public:
     }
 
 #ifdef ACTORX_DEBUG
-    int64_t tworks = 0;
-    int64_t pworks = 0;
-    int64_t mworks = 0;
-    for (auto& thrdat : thread_data_list_)
-    {
-      pworks += thrdat.pworks_;
-      mworks += thrdat.mworks_;
-      tworks += thrdat.pworks_ + thrdat.mworks_;
-    }
     SPDLOG_DEBUG(logger_, "p: {}, m: {}, t: {}\n", pworks, mworks, tworks);
 #endif
   }
@@ -408,23 +411,20 @@ public:
               for (auto n : priors)
               {
                 /// Try pop a worker to run.
-                pworks += do_work(n, thrctx);
+                pworks += do_work(n, thrctx, work_level::prior);
               }
 
               /// @todo works dynamic load balance.
               if (pworks > 0)
               {
-                thrdat.pworks_ += pworks;
                 continue;
               }
 
-              size_t mworks = 0;
               for (auto n : minors)
               {
                 /// Try pop a worker to run.
-                mworks += do_work(n, thrctx);
+                do_work(n, thrctx, work_level::minor);
               }
-              thrdat.mworks_ += mworks;
             }
           })
         );
@@ -462,7 +462,7 @@ public:
   }
 
 private:
-  size_t do_work(size_t wkridx, thrctx_t& thrctx) noexcept
+  size_t do_work(size_t wkridx, thrctx_t& thrctx, work_level wlv) noexcept
   {
     size_t works = 0;
     auto wkr = workshop_[wkridx].exchange(nullptr, std::memory_order_acq_rel);
@@ -480,7 +480,7 @@ private:
           ///   be omited.
           notify_thread(wkridx);
         });
-      works += wkr->work(thrctx);
+      works += wkr->work(thrctx, wlv);
     }
     return works;
   }
@@ -594,8 +594,6 @@ private:
       : thrctx_(new thrctx_t(evs, index, std::move(logger)))
       , stop_(false)
     {
-      pworks_ = 0;
-      mworks_ = 0;
     }
 
     inline bool is_stop() const noexcept
@@ -609,9 +607,6 @@ private:
     std::unique_ptr<thrctx_t> thrctx_;
     cque::mpsc_queue<detail::tstart_event, eclipse_clock_t> tstart_que_;
     cque::mpsc_queue<detail::texit_event, eclipse_clock_t> texit_que_;
-
-    int64_t pworks_;
-    int64_t mworks_;
 
     CQUE_CACHE_ALIGNED_VAR(std::atomic_bool, stop_);
     CQUE_CACHE_ALIGNED_VAR(coctx::context, host_ctx_);

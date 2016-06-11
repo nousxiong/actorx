@@ -2,8 +2,7 @@
 /// Test csegv.
 ///
 
-#include <actorx/utest/utest.hpp>
-
+#include <actorx/utest/all.hpp>
 #include <actorx/csegv/all.hpp>
 
 #include <thread>

@@ -2,8 +2,7 @@
 /// Test coctx.
 ///
 
-#include <actorx/utest/utest.hpp>
-
+#include <actorx/utest/all.hpp>
 #include <actorx/coctx/all.hpp>
 
 #include <functional>

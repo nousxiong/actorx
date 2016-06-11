@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include "actorx/user.hpp"
-#include "actorx/csegv/all.hpp"
-
-#include <gsl.h>
+#include "actorx/utest/config.hpp"
 
 #include <thread>
 #include <chrono>

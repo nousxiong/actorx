@@ -2,7 +2,7 @@
 /// Test spawn.
 ///
 
-#include <actorx/utest/utest.hpp>
+#include <actorx/utest/all.hpp>
 
 #ifdef _WIN32
 # ifndef _WIN32_WINNT

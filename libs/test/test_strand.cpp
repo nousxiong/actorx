@@ -2,8 +2,7 @@
 /// Test strand.
 ///
 
-#include <actorx/utest/utest.hpp>
-
+#include <actorx/utest/all.hpp>
 #include <actorx/asev/all.hpp>
 
 #include <chrono>

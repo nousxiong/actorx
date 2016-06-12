@@ -86,7 +86,7 @@ public:
   {
     buf.append(prefix);
     char numstr[32] = "\0";
-    std::snprintf(numstr, 32, "%lld", tp.time_since_epoch().count());
+    std::snprintf(numstr, 32, "%lld", (long long)tp.time_since_epoch().count());
     buf.append(numstr);
     buf.append(">");
     if (msg != nullptr)

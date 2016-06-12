@@ -114,11 +114,9 @@ static std::list<stack_info> get_stack_list(
 
 static std::list<stack_info> get_stack_list(
   void* reg_bp, void*, void* reg_ip,
-  size_t map_depth, size_t offset, bool module, bool symbol, bool brief
+  size_t stack_depth, size_t offset, bool module, bool symbol, bool brief
   )
 {
-  auto stack_depth = max_stack_depth();
-  Expects(map_depth && map_depth <= stack_depth);
   std::vector<void*> traceback;
 
   Dl_info dlinfo;
@@ -178,8 +176,9 @@ static void signal_filter(context& ctx)
   sigemptyset(&sigact.sa_mask);
   sigact.sa_flags = SA_SIGINFO | SA_ONSTACK;
   sigact.sa_sigaction =
-    [&ctx](int signum, siginfo_t* info, void* ptr)
+    [](int signum, siginfo_t* info, void* ptr)
     {
+      auto& ctx = context::get();
       auto stack_depth = ctx.stack_depth_;
       auto ucontext = (ucontext_t*)ptr;
 # ifdef REG_RIP

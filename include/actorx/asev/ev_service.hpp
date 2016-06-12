@@ -13,6 +13,7 @@
 #include "actorx/asev/detail/spawn_event.hpp"
 #include "actorx/asev/detail/tstart_event.hpp"
 #include "actorx/asev/detail/texit_event.hpp"
+#include "actorx/asev/detail/tsegv_event.hpp"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/null_sink.h>
@@ -22,6 +23,7 @@
 #include <condition_variable>
 #include <chrono>
 #include <vector>
+#include <list>
 #include <deque>
 #include <atomic>
 #include <memory>
@@ -42,6 +44,7 @@ class ev_service
   using coro_handler_t = std::function<void (corctx_t&)>;
   using tstart_handler_t = std::function<void (thrctx_t&)>;
   using texit_handler_t = std::function<void (thrctx_t&)>;
+  using tsegv_handler_t = std::function<void(thrctx_t&, std::list<csegv::stack_info> const&)>;
   using uid_t = unsigned int;
   using worker_ptr = std::atomic<detail::worker*>;
   using logger_ptr = std::shared_ptr<spdlog::logger>;
@@ -235,6 +238,16 @@ public:
     pri_texit(texit_handler_t(f));
   }
 
+  /// Post a handler into all background threads to run when catched segv.
+  /**
+  * @param f Handler that will run when catched segv.
+  */
+  template <typename F>
+  void tsegv(F&& f)
+  {
+    pri_tsegv(tsegv_handler_t(f));
+  }
+
   /// Make an event using thread_local pool.
   template <typename Event, typename PoolMake = cque::pool_make<Event>>
   gsl::owner<Event*> make_event(PoolMake pmk = PoolMake{})
@@ -292,57 +305,18 @@ public:
           {
             auto& thrdat = thread_data_list_[i];
             auto& thrctx = *pri_current(thrdat.thrctx_.get());
-            auto const thread_num = thread_data_list_.size();
-            auto const worker_num = worker_list_.size();
 
-            /// Get prior, minor and inferior workers.
-            std::vector<size_t> priors;
-            std::vector<size_t> minors;
-            for (size_t n=0; n<worker_num; ++n)
-            {
-              auto mod = n % thread_num;
-              if (mod == i)
+            csegv::pcall(
+              [this, i]()
               {
-                priors.push_back(n);
-              }
-              else
+                trun(i);
+              },
+              [this, &thrdat, &thrctx](std::list<csegv::stack_info> const& stack_info_list)
               {
-                minors.push_back(n);
-              }
-            }
-
-            /// Run all tstart event.
-            while (true)
-            {
-              auto ev = thrdat.tstart_que_.pop();
-              if (ev == nullptr)
-              {
-                break;
-              }
-
-              bool is_auto = true;
-              try
-              {
-                is_auto = ev->handle(thrctx);
-              }
-              catch (...)
-              {
-                Ensures(false);
-              }
-
-              if (is_auto)
-              {
-                ev->release();
-              }
-            }
-
-            /// Set callback to run all texit.
-            auto texit = gsl::finally(
-              [&thrdat, &thrctx]()
-              {
+                /// Run all tsegv event.
                 while (true)
                 {
-                  auto ev = thrdat.texit_que_.pop();
+                  auto ev = thrdat.tsegv_que_.pop();
                   if (ev == nullptr)
                   {
                     break;
@@ -351,6 +325,7 @@ public:
                   bool is_auto = true;
                   try
                   {
+                    ev->set_stack_info_list(stack_info_list);
                     is_auto = ev->handle(thrctx);
                   }
                   catch (...)
@@ -364,68 +339,6 @@ public:
                   }
                 }
               });
-
-            /// Poll loop sleep duration.
-            std::chrono::microseconds const poll_sleep_dur{50};
-
-            /// Work loop.
-            while (!thrdat.is_stop())
-            {
-              try
-              {
-                /// First try aggressive polling.
-                for (size_t i=0; i<100; ++i)
-                {
-                  if (thrdat.cnt_.reset() > 0)
-                  {
-                    goto do_job;
-                  }
-                }
-
-                /// Then moderate polling.
-                for (size_t i=0; i<500; ++i)
-                {
-                  if (thrdat.cnt_.reset() > 0 || thrdat.is_stop())
-                  {
-                    goto do_job;
-                  }
-                  std::this_thread::sleep_for(poll_sleep_dur);
-                }
-
-                /// Finally waiting notify.
-                thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
-
-              do_job:
-                if (thrdat.is_stop())
-                {
-                  break;
-                }
-              }
-              catch (...)
-              {
-                Ensures(false);
-              }
-
-              /// Firstly try run prior workers.
-              size_t pworks = 0;
-              for (auto n : priors)
-              {
-                /// Try pop a worker to run.
-                pworks += do_work(n, thrctx, work_level::prior);
-              }
-
-              /// @todo works dynamic load balance.
-              if (pworks > 0)
-              {
-                continue;
-              }
-
-              for (auto n : minors)
-              {
-                /// Try pop a worker to run.
-                do_work(n, thrctx, work_level::minor);
-              }
-            }
           })
         );
     }
@@ -462,6 +375,146 @@ public:
   }
 
 private:
+  void trun(size_t tidx)
+  {
+    auto& thrdat = thread_data_list_[tidx];
+    auto& thrctx = *pri_current(thrdat.thrctx_.get());
+    auto const thread_num = thread_data_list_.size();
+    auto const worker_num = worker_list_.size();
+
+    /// Get prior, minor and inferior workers.
+    std::vector<size_t> priors;
+    std::vector<size_t> minors;
+    for (size_t n = 0; n<worker_num; ++n)
+    {
+      auto mod = n % thread_num;
+      if (mod == tidx)
+      {
+        priors.push_back(n);
+      }
+      else
+      {
+        minors.push_back(n);
+      }
+    }
+
+    /// Run all tstart event.
+    while (true)
+    {
+      auto ev = thrdat.tstart_que_.pop();
+      if (ev == nullptr)
+      {
+        break;
+      }
+
+      bool is_auto = true;
+      try
+      {
+        is_auto = ev->handle(thrctx);
+      }
+      catch (...)
+      {
+        Ensures(false);
+      }
+
+      if (is_auto)
+      {
+        ev->release();
+      }
+    }
+
+    /// Set callback to run all texit.
+    auto texit = gsl::finally(
+      [&thrdat, &thrctx]()
+    {
+      while (true)
+      {
+        auto ev = thrdat.texit_que_.pop();
+        if (ev == nullptr)
+        {
+          break;
+        }
+
+        bool is_auto = true;
+        try
+        {
+          is_auto = ev->handle(thrctx);
+        }
+        catch (...)
+        {
+          Ensures(false);
+        }
+
+        if (is_auto)
+        {
+          ev->release();
+        }
+      }
+    });
+
+    /// Poll loop sleep duration.
+    std::chrono::microseconds const poll_sleep_dur{ 50 };
+
+    /// Work loop.
+    while (!thrdat.is_stop())
+    {
+      try
+      {
+        /// First try aggressive polling.
+        for (size_t i = 0; i<100; ++i)
+        {
+          if (thrdat.cnt_.reset() > 0)
+          {
+            goto do_job;
+          }
+        }
+
+        /// Then moderate polling.
+        for (size_t i = 0; i<500; ++i)
+        {
+          if (thrdat.cnt_.reset() > 0 || thrdat.is_stop())
+          {
+            goto do_job;
+          }
+          std::this_thread::sleep_for(poll_sleep_dur);
+        }
+
+        /// Finally waiting notify.
+        thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
+
+      do_job:
+        if (thrdat.is_stop())
+        {
+          break;
+        }
+      }
+      catch (...)
+      {
+        Ensures(false);
+      }
+
+      /// Firstly try run prior workers.
+      size_t pworks = 0;
+      for (auto n : priors)
+      {
+        /// Try pop a worker to run.
+        pworks += do_work(n, thrctx, work_level::prior);
+      }
+
+      /// @todo works dynamic load balance.
+      if (pworks > 0)
+      {
+        continue;
+      }
+
+      for (auto n : minors)
+      {
+        /// Try pop a worker to run.
+        do_work(n, thrctx, work_level::minor);
+      }
+    }
+  }
+
   size_t do_work(size_t wkridx, thrctx_t& thrctx, work_level wlv) noexcept
   {
     size_t works = 0;
@@ -540,6 +593,17 @@ private:
     }
   }
 
+  void pri_tsegv(tsegv_handler_t&& hdr)
+  {
+    tsegv_handler_t h(hdr);
+    for (auto& thrdat : thread_data_list_)
+    {
+      auto ev = make_event<detail::tsegv_event>();
+      ev->set_handler(h);
+      thrdat.tsegv_que_.push(ev);
+    }
+  }
+
   void notify_thread(size_t wkridx)
   {
     auto thridx = wkridx % thread_data_list_.size();
@@ -607,6 +671,7 @@ private:
     std::unique_ptr<thrctx_t> thrctx_;
     cque::mpsc_queue<detail::tstart_event, eclipse_clock_t> tstart_que_;
     cque::mpsc_queue<detail::texit_event, eclipse_clock_t> texit_que_;
+    cque::mpsc_queue<detail::tsegv_event, eclipse_clock_t> tsegv_que_;
 
     CQUE_CACHE_ALIGNED_VAR(std::atomic_bool, stop_);
     CQUE_CACHE_ALIGNED_VAR(coctx::context, host_ctx_);

@@ -9,8 +9,47 @@
 #include <cassert>
 
 
+struct usr_data
+{
+  int i_;
+  std::string str_;
+};
+
+namespace actorx
+{
+template <>
+struct tostring<usr_data>
+{
+  static fmt::MemoryWriter cast(usr_data const& v)
+  {
+    fmt::MemoryWriter w;
+    w.write("usr_data<");
+    w << v.i_;
+    w.write(".");
+    w << v.str_;
+    w.write(">");
+    return std::move(w);
+  }
+};
+}
+
 UTEST_CASE_SEQ(10, test_assertion)
 {
+  try
+  {
+    usr_data udat;
+    udat.i_ = 42;
+    udat.str_ = "the answer is 42";
+    ACTORX_ENSURES(udat.i_ == 41)(udat).except();
+    Ensures(false);
+  }
+  catch (std::exception& ex)
+  {
+    std::cerr << ex.what() << std::endl;
+  }
+
+  std::cout << "------------------" << std::endl;
+
   try
   {
     int i = 0;

@@ -489,13 +489,13 @@ public:
       std::is_pointer<param_t>::value, ptr_t, select_enum_t
     >::type select_ptr_t;
 
-    pri_set_var(select_ptr_t(), std::forward<T>(v), name);
+    pri_set_var(select_ptr_t(), v, name);
     return *this;
   }
 
 private:
   template <typename T>
-  assertion& pri_set_var(T v, gsl::czstring name)
+  assertion& pri_set_var(T const v, gsl::czstring name)
   {
     str_.write("  ");
     str_.write(name);
@@ -506,7 +506,7 @@ private:
   }
 
   template <typename T>
-  assertion& pri_set_var(enum_t, T v, gsl::czstring name)
+  assertion& pri_set_var(enum_t, T const v, gsl::czstring name)
   {
     str_.write("  ");
     str_.write(name);
@@ -517,12 +517,12 @@ private:
   }
 
   template <typename T>
-  assertion& pri_set_var(other_t, T v, gsl::czstring name)
+  assertion& pri_set_var(other_t, T const& v, gsl::czstring name)
   {
     str_.write("  ");
     str_.write(name);
     str_.write(" = ");
-    str_.write(tostring<T>::cast(v));
+    str_.write(tostring<T>::cast(v).c_str());
     str_.write("\n");
     return *this;
   }

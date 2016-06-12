@@ -26,11 +26,19 @@ struct ucase
 
 class context
 {
+  /// Private construtor to ensure that there is no way there could be more than one context.
+  context() {}
+
+  context(context const&) = delete;
+  context& operator=(context const&) = delete;
+  context(context&&) = delete;
+  context& operator=(context&&) = delete;
+
 public:
-  static context* instance()
+  static context& instance()
   {
     static context ctx;
-    return &ctx;
+    return ctx;
   }
 
   template <typename F>
@@ -63,9 +71,6 @@ public:
 
   void run()
   {
-    /// Init csegv.
-    csegv::init();
-
     if (!enabled_list_.empty())
     {
       auto seq_case_list = seq_case_list_;
@@ -177,20 +182,24 @@ private:
   int total_loop_;
 };
 
+/// Helper function.
+static context& get()
+{
+  return context::instance();
+}
+
 struct auto_reg
 {
   template <typename F>
   auto_reg(std::string name, F f)
   {
-    auto ctx = utest::context::instance();
-    ctx->add_case(std::move(name), std::forward<F>(f));
+    get().add_case(std::move(name), std::forward<F>(f));
   }
 
   template <typename F>
   auto_reg(int priority, std::string name, F f, bool is_final)
   {
-    auto ctx = utest::context::instance();
-    ctx->add_case(priority, std::move(name), std::forward<F>(f), is_final);
+    get().add_case(priority, std::move(name), std::forward<F>(f), is_final);
   }
 };
 
@@ -198,8 +207,7 @@ struct auto_disable
 {
   explicit auto_disable(std::string name)
   {
-    auto ctx = utest::context::instance();
-    ctx->add_disabled(std::move(name));
+    get().add_disabled(std::move(name));
   }
 };
 
@@ -207,8 +215,7 @@ struct auto_enable
 {
   explicit auto_enable(std::string name)
   {
-    auto ctx = utest::context::instance();
-    ctx->add_enabled(std::move(name));
+    get().add_enabled(std::move(name));
   }
 };
 } /// namespace utest
@@ -255,7 +262,6 @@ struct auto_enable
 #define UTEST_MAIN \
   int main() \
   { \
-    auto ctx = utest::context::instance(); \
-    ctx->run(); \
+    utest::get().run(); \
     return 0; \
   }

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "actorx/csegv/config.hpp"
-#include "actorx/csegv/detail/stack.hpp"
+#include "actorx/csegv/stack_info.hpp"
 
 #include <list>
 #include <vector>
@@ -109,11 +109,9 @@ static size_t check_file_name(char* name)
 
 static std::list<stack_info> get_stack_list(
   void* bp, void* sp, void* ip,
-  size_t max_depth, size_t offset, bool module, bool symbol
+  size_t max_depth, size_t offset, bool module, bool symbol, bool brief
 )
 {
-  assert(max_depth <= max_stack_depth());
-
   QWORD trace[33];
   CONTEXT context;
 
@@ -134,7 +132,7 @@ static std::list<stack_info> get_stack_list(
   HANDLE hProcess = GetCurrentProcess();
   for (size_t i = offset; i < depths; i++)
   {
-    stack_info stack_result;
+    stack_info stack_result(brief);
 
     {
       DWORD symbolDisplacement = 0;
@@ -193,11 +191,28 @@ static std::list<stack_info> get_stack_list(
   return image_list;
 }
 
+struct context
+{
+  static context& get()
+  {
+    static thread_local context ctx;
+    return ctx;
+  }
+
+  /// Local templ vars.
+  size_t stack_depth_;
+  bool brief_;
+  handler_t h_;
+};
+
 /// SEH 's filter function.
 static int seh_filter(LPEXCEPTION_POINTERS exinfo)
 {
+  auto& ctx = context::get();
+  size_t stack_depth = ctx.stack_depth_;
+  bool brief = ctx.brief_;
+  handler_t h = std::move(ctx.h_);
   auto ecd = exinfo->ExceptionRecord->ExceptionCode;
-  auto stack_depth = max_stack_depth();
 
 #ifdef _WIN64
   auto stack_list =
@@ -205,7 +220,7 @@ static int seh_filter(LPEXCEPTION_POINTERS exinfo)
       (void*)exinfo->ContextRecord->Rbp,
       (void*)exinfo->ContextRecord->Rsp,
       (void*)exinfo->ContextRecord->Rip,
-      stack_depth, 0, true, true
+      stack_depth, 0, true, true, brief
       );
 #else
   auto stack_list =
@@ -213,11 +228,10 @@ static int seh_filter(LPEXCEPTION_POINTERS exinfo)
       (void*)exinfo->ContextRecord->Ebp,
       (void*)exinfo->ContextRecord->Esp,
       (void*)exinfo->ContextRecord->Eip,
-      stack_depth, 0, true, true
+      stack_depth, 0, true, true, brief
       );
 #endif
 
-  auto h = get_handler();
   if (h)
   {
     h(stack_list);
@@ -237,6 +251,19 @@ static int seh_filter(LPEXCEPTION_POINTERS exinfo)
     return EXCEPTION_EXECUTE_HANDLER;
   }
   return EXCEPTION_CONTINUE_SEARCH;
+}
+
+template <typename F>
+static void pcall_impl(F&& f)
+{
+  __try
+  {
+    f();
+  }
+  __except (detail::seh_filter(GetExceptionInformation()))
+  {
+    std::exit(102);
+  }
 }
 } /// namespace detail
 } /// namespace csegv

@@ -30,8 +30,6 @@ void handler(std::list<csegv::stack_info> const& stack_list)
 
 UTEST_CASE_FINAL(10000, test_csegv)
 {
-  csegv::init(3, true, handler);
-
   std::thread thr(
     []()
     {
@@ -42,7 +40,8 @@ UTEST_CASE_FINAL(10000, test_csegv)
           badass();
           int b = i;
           ++b;
-        });
+        }, handler
+        );
     });
   thr.join();
   std::cout << "done." << std::endl;

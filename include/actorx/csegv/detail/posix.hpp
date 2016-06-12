@@ -5,7 +5,7 @@
 #pragma once
 
 #include "actorx/csegv/config.hpp"
-#include "actorx/csegv/detail/stack.hpp"
+#include "actorx/csegv/stack_info.hpp"
 
 #include <list>
 #include <vector>
@@ -40,7 +40,7 @@ static bool cut_file_line(char const* buff, int& length, int& line)
 #define CSEGV_ADDR2LINE "addr2line -f -e "
 
 static std::list<stack_info> get_stack_list(
-  void** traceback, size_t size, bool module, bool symbol
+  void** traceback, size_t size, bool module, bool symbol, bool brief
   )
 {
   std::list<stack_info> image_list;
@@ -64,7 +64,7 @@ static std::list<stack_info> get_stack_list(
       char buff[1024] = "\0";
       while (true)
       {
-        stack_info stack_result;
+        stack_info stack_result(brief);
         if (std::fgets(buff, sizeof(buff), fp) != nullptr)
         {
           if (symbol)
@@ -114,7 +114,7 @@ static std::list<stack_info> get_stack_list(
 
 static std::list<stack_info> get_stack_list(
   void* reg_bp, void*, void* reg_ip,
-  size_t map_depth, size_t offset, bool module, bool symbol
+  size_t map_depth, size_t offset, bool module, bool symbol, bool brief
   )
 {
   auto stack_depth = max_stack_depth();
@@ -143,25 +143,30 @@ static std::list<stack_info> get_stack_list(
 
   if (traceback.size() > offset)
   {
-    return get_stack_list(&traceback[offset], traceback.size() - offset, module, symbol);
+    return get_stack_list(&traceback[offset], traceback.size() - offset, module, symbol, brief);
   }
   return std::list<stack_info>();
 }
 
 struct context
 {
-  bool inited_;
+  static context& get()
+  {
+    static thread_local context ctx;
+    return ctx;
+  }
+
   static size_t constexpr const size_ = 8 * 1024;
   unsigned char stack_[size_];
+
+  /// Local templ vars.
+  size_t stack_depth_;
+  bool brief_;
+  handler_t h_;
 };
 
 static void signal_filter(context& ctx)
 {
-  if (ctx.inited_)
-  {
-    return;
-  }
-
   stack_t sigaltStack;
   sigaltStack.ss_size = ctx.size_;
   sigaltStack.ss_sp = ctx.stack_;
@@ -173,9 +178,9 @@ static void signal_filter(context& ctx)
   sigemptyset(&sigact.sa_mask);
   sigact.sa_flags = SA_SIGINFO | SA_ONSTACK;
   sigact.sa_sigaction =
-    [](int signum, siginfo_t* info, void* ptr)
+    [&ctx](int signum, siginfo_t* info, void* ptr)
     {
-      auto stack_depth = max_stack_depth();
+      auto stack_depth = ctx.stack_depth_;
       auto ucontext = (ucontext_t*)ptr;
 # ifdef REG_RIP
       auto reg_bp = REG_RBP;
@@ -187,10 +192,11 @@ static void signal_filter(context& ctx)
       auto stack_list =
         detail::get_stack_list(
           (void*)ucontext->uc_mcontext.gregs[reg_bp], nullptr,
-          (void*)ucontext->uc_mcontext.gregs[reg_ip], stack_depth, 0, true, true
+          (void*)ucontext->uc_mcontext.gregs[reg_ip],
+          stack_depth, 0, true, true, ctx.brief_
         );
 
-      auto h = get_handler();
+      auto h = std::move(ctx.h_);
       if (h)
       {
         h(stack_list);
@@ -206,8 +212,6 @@ static void signal_filter(context& ctx)
       std::exit(102);
     };
   sigaction(SIGSEGV, &sigact, nullptr);
-
-  ctx.inited_ = true;
 }
 } /// namespace detail
 } /// namespace csegv

@@ -11,6 +11,7 @@
 
 #include "actorx/csegv/config.hpp"
 #include "actorx/csegv/csegv.hpp"
+#include "actorx/csegv/stack_info.hpp"
 
 #ifdef _MSC_VER
 # pragma warning (pop)

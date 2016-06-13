@@ -122,7 +122,7 @@ static std::list<stack_info> get_stack_list(
   Dl_info dlinfo;
   void* ip = reg_ip;
   void** bp = (void**)reg_bp;
-  while (ip && traceback.size() < stack_depth)
+  while (&ip != bp && traceback.size() < stack_depth)
   {
     if (dladdr(ip, &dlinfo) == 0)
     {
@@ -136,7 +136,7 @@ static std::list<stack_info> get_stack_list(
     }
 
     ip = bp[1];
-    bp = (void**)bp[0];
+    bp = (void**)(*bp);
   }
 
   if (traceback.size() > offset)
@@ -144,6 +144,39 @@ static std::list<stack_info> get_stack_list(
     return get_stack_list(&traceback[offset], traceback.size() - offset, module, symbol, brief);
   }
   return std::list<stack_info>();
+}
+
+/// Using backtrace to get stack list.
+static std::list<stack_info> get_stack_list(size_t stack_depth)
+{
+  Expects(stack_depth <= 32);
+
+  std::list<stack_info> stack_info_list;
+  void* trace_buf[32];
+  auto trace_size = backtrace(trace_buf, stack_depth);
+  auto trace_infos = backtrace_symbols(trace_buf, trace_size);
+
+  auto _ = gsl::finally(
+    [trace_infos]()
+    {
+      if (trace_infos != nullptr)
+      {
+        std::free(trace_infos);
+      }
+    });
+
+  if (trace_infos == nullptr || (*trace_infos) == nullptr)
+  {
+    return stack_info_list;
+  }
+
+  for(size_t i=0; i<trace_size; ++i)
+  {
+    stack_info stk;
+    stk.module_ = trace_infos[i];
+    stack_info_list.push_back(std::move(stk));
+  }
+  return stack_info_list;
 }
 
 struct context
@@ -165,11 +198,11 @@ struct context
 
 static void signal_filter(context& ctx)
 {
-  stack_t sigaltStack;
-  sigaltStack.ss_size = ctx.size_;
-  sigaltStack.ss_sp = ctx.stack_;
-  sigaltStack.ss_flags = 0;
-  sigaltstack(&sigaltStack, nullptr);
+  stack_t sigstk;
+  sigstk.ss_size = ctx.size_;
+  sigstk.ss_sp = ctx.stack_;
+  sigstk.ss_flags = 0;
+  sigaltstack(&sigstk, nullptr);
 
   struct sigaction sigact;
   std::memset(&sigact, 0, sizeof(sigact));
@@ -180,6 +213,8 @@ static void signal_filter(context& ctx)
     {
       auto& ctx = context::get();
       auto stack_depth = ctx.stack_depth_;
+
+#if defined(REG_RIP) || defined(REG_EIP)
       auto ucontext = (ucontext_t*)ptr;
 # ifdef REG_RIP
       auto reg_bp = REG_RBP;
@@ -194,6 +229,9 @@ static void signal_filter(context& ctx)
           (void*)ucontext->uc_mcontext.gregs[reg_ip],
           stack_depth, 0, true, true, ctx.brief_
         );
+#else
+      auto stack_list = detail::get_stack_list(stack_depth);
+#endif
 
       auto h = std::move(ctx.h_);
       if (h)

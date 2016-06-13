@@ -163,8 +163,4 @@ UTEST_CASE(test_pingpong)
   auto time_span =
     std::chrono::duration_cast<std::chrono::duration<double>>(et - bt);
   std::cout << "done, eclipse: " << time_span.count() << " s" << std::endl;
-
-#ifdef SPDLOG_DEBUG_ON
-  Ensures(false);
-#endif // SPDLOG_DEBUG_ON
 }

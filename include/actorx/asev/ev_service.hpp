@@ -311,9 +311,10 @@ public:
               {
                 trun(i);
               },
-              [this, &thrdat, &thrctx](std::list<csegv::stack_info> const& stack_info_list)
+              [this, &thrdat, &thrctx, i](std::list<csegv::stack_info> const& stack_info_list)
               {
                 /// Run all tsegv event.
+                int count = 0;
                 while (true)
                 {
                   auto ev = thrdat.tsegv_que_.pop();
@@ -337,6 +338,21 @@ public:
                   {
                     ev->release();
                   }
+                  ++count;
+                }
+
+                if (count == 0)
+                {
+                  fmt::MemoryWriter w;
+                  w.write("asev thread index: {}\n", i);
+                  for (auto& ele : stack_info_list)
+                  {
+                    w.write("{}\n", ele);
+                  }
+                  w.write("\n");
+
+                  auto lg = thrctx.get_logger();
+                  lg->error(w.c_str());
                 }
               });
           })

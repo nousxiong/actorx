@@ -66,7 +66,7 @@ struct stack_info
     symbol_ = s.symbol_;
   }
 
-  friend std::ostream& operator <<(std::ostream& out, stack_info const& s)
+  friend std::ostream& operator<<(std::ostream& out, stack_info const& s)
   {
     auto file = s.file_;
     auto module = s.module_;

@@ -16,8 +16,8 @@ file (GLOB_RECURSE ACTORX_UNIT_TEST_FILES ${ACTORX_UNIT_TEST_FILES} "${CMAKE_CUR
 
 add_executable (actorx_ut ${ACTORX_UNIT_TEST_FILES})
 
-if (ACTORX_LINK_PROP)
-  set_target_properties (actorx_ut PROPERTIES LINK_FLAGS "${ACTORX_LINK_PROP}")
+if (ACTORX_LINK_PROPS)
+  set_target_properties (actorx_ut PROPERTIES LINK_FLAGS "${ACTORX_LINK_PROPS}")
 endif ()
 
 if (TESTS_LINK_LIBS)

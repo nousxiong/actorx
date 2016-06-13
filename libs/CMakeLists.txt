@@ -39,7 +39,7 @@ install (
   )
 
 if (ACTORX_STATIC)
-  set (ACTORX_LINK_PROP "${ACTORX_LINK_PROP} -static -static-libgcc -static-libstdc++")
+  set (ACTORX_LINK_PROPS "${ACTORX_LINK_PROPS} -static -static-libgcc -static-libstdc++")
 endif ()
 
 # Build examples.

@@ -89,7 +89,7 @@ public:
   void retain(std::shared_ptr<T>&& self) noexcept
   {
     static_assert(std::is_base_of<node_base, T>::value, "T must inhert from cque::node_base");
-    Expects(self.get() == this);
+    ACTORX_ASSERTS(self.get() == this);
     self_ = self;
   }
 

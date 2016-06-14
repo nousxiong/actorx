@@ -268,7 +268,7 @@ public:
         }
       }
 
-      Expects(uid_ < ASEV_MAX_EV_SERVICE);
+      ACTORX_EXPECTS(uid_ < ASEV_MAX_EV_SERVICE);
 
       auto& curr_pool = pool_array.arr_[uid_];
       if (curr_pool == nullptr)
@@ -286,7 +286,7 @@ public:
       pool = &thrctx->get_event_pool<Event, PoolMake>(pmk);
     }
 
-    Ensures(pool != nullptr);
+    ACTORX_ASSERTS(pool != nullptr);
     return cque::get<Event>(*pool);
   }
 
@@ -331,7 +331,7 @@ public:
                   }
                   catch (...)
                   {
-                    Ensures(false);
+                    ACTORX_ENSURES(false);
                   }
 
                   if (is_auto)
@@ -430,7 +430,7 @@ private:
       }
       catch (...)
       {
-        Ensures(false);
+        ACTORX_ENSURES(false);
       }
 
       if (is_auto)
@@ -458,7 +458,7 @@ private:
         }
         catch (...)
         {
-          Ensures(false);
+          ACTORX_ENSURES(false);
         }
 
         if (is_auto)
@@ -506,7 +506,7 @@ private:
       }
       catch (...)
       {
-        Ensures(false);
+        ACTORX_ENSURES(false);
       }
 
       /// Firstly try run prior workers.
@@ -642,7 +642,7 @@ private:
 
   coctx::context& get_hostctx(size_t index)
   {
-    Expects(index < thread_data_list_.size());
+    ACTORX_ASSERTS(index < thread_data_list_.size());
     return thread_data_list_[index].host_ctx_;
   }
 

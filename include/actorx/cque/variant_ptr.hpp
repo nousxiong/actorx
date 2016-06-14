@@ -118,7 +118,7 @@ public:
   /// Operator ->.
   T* operator->() const noexcept
   {
-    Expects(shared_.get() != nullptr || unique_.get() != nullptr || raw_ != nullptr);
+    ACTORX_ASSERTS(shared_.get() != nullptr || unique_.get() != nullptr || raw_ != nullptr);
     if (shared_)
     {
       return shared_.get();
@@ -136,7 +136,7 @@ public:
   /// Operator *.
   T& operator*() const noexcept
   {
-    Expects(shared_.get() != nullptr || unique_.get() != nullptr || raw_ != nullptr);
+    ACTORX_ASSERTS(shared_.get() != nullptr || unique_.get() != nullptr || raw_ != nullptr);
     if (shared_)
     {
       return *shared_;

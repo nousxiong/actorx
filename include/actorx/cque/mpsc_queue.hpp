@@ -70,7 +70,7 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(!e->shared());
+      ACTORX_ASSERTS(!e->shared());
       e->free_unique();
     }
     return e;
@@ -84,8 +84,8 @@ public:
       return;
     }
 
-    Expects(!e->shared());
-    Expects(!e->unique());
+    ACTORX_ASSERTS(!e->shared());
+    ACTORX_ASSERTS(!e->unique());
     pri_push(e);
   }
 
@@ -144,7 +144,7 @@ public:
   template <class Mutex, class CondVar, typename TimeDuration>
   std::pair<gsl::owner<T*>, duration_t> synchronized_pop(Mutex& mtx, CondVar& cv, TimeDuration const& timeout)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto e = pop();
@@ -214,10 +214,10 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(e->shared());
-      Expects(!e->unique());
+      ACTORX_ASSERTS(e->shared());
+      ACTORX_ASSERTS(!e->unique());
       auto ptr = e->free_shared();
-      Ensures(ptr);
+      ACTORX_ASSERTS(!!ptr);
       return std::move(std::static_pointer_cast<T>(ptr));
     }
     return std::shared_ptr<T>();
@@ -248,7 +248,7 @@ public:
   std::pair<std::shared_ptr<T>, duration_t>
     synchronized_pop_shared(Mutex& mtx, CondVar& cv, TimeDuration const& timeout)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto e = pop_shared();
@@ -318,8 +318,8 @@ public:
     }
 
     auto p = e.get();
-    Expects(!p->shared());
-    Expects(!p->unique());
+    ACTORX_ASSERTS(!p->shared());
+    ACTORX_ASSERTS(!p->unique());
     p->retain(std::move(e));
     pri_push(p);
   }
@@ -365,7 +365,7 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(!e->shared());
+      ACTORX_ASSERTS(!e->shared());
       e->free_unique();
     }
     return std::move(std::unique_ptr<T, D>(e, d));
@@ -398,7 +398,7 @@ public:
   std::pair<std::unique_ptr<T, D>, duration_t>
     synchronized_pop_unique(Mutex& mtx, CondVar& cv, TimeDuration const& timeout, D d = D())
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto e = pop_unique(d);
@@ -469,8 +469,8 @@ public:
     }
 
     auto p = e.release();
-    Expects(!p->shared());
-    Expects(!p->unique());
+    ACTORX_ASSERTS(!p->shared());
+    ACTORX_ASSERTS(!p->unique());
     p->retain();
     pri_push(p);
   }
@@ -515,21 +515,21 @@ public:
     {
       if (e->shared())
       {
-        Expects(!e->unique());
+        ACTORX_ASSERTS(!e->unique());
         auto ptr = e->free_shared();
-        Ensures(!!ptr);
+        ACTORX_ASSERTS(!!ptr);
         return std::move(variant_ptr<T, D>(std::static_pointer_cast<T>(ptr)));
       }
       else if (e->unique())
       {
-        Expects(!e->shared());
+        ACTORX_ASSERTS(!e->shared());
         e->free_unique();
         return std::move(variant_ptr<T, D>(std::unique_ptr<T, D>(e)));
       }
       else
       {
-        Expects(!e->unique());
-        Expects(!e->shared());
+        ACTORX_ASSERTS(!e->unique());
+        ACTORX_ASSERTS(!e->shared());
         return std::move(variant_ptr<T, D>(e));
       }
     }
@@ -563,7 +563,7 @@ public:
   std::pair<variant_ptr<T, D>, duration_t>
     synchronized_pop_variant(Mutex& mtx, CondVar& cv, TimeDuration const& timeout, D d = D())
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto e = pop_variant(d);
@@ -667,9 +667,8 @@ private:
   }
 
   /// Push an element at head.
-  void pri_push(gsl::owner<T*> e) noexcept
+  void pri_push(gsl::not_null<T*> e) noexcept
   {
-    Expects(e != nullptr);
     auto stale_head = head_.load(std::memory_order_relaxed);
     do
     {
@@ -680,7 +679,7 @@ private:
   template <class Mutex, class CondVar>
   gsl::owner<T*> pri_synchronized_pop(Mutex& mtx, CondVar& cv)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     auto e = pop();
     if (e != nullptr)
     {
@@ -704,7 +703,7 @@ private:
   template <class Mutex, class CondVar>
   std::shared_ptr<T> pri_synchronized_pop_shared(Mutex& mtx, CondVar& cv)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     auto e = pop_shared();
     if (e)
     {
@@ -728,7 +727,7 @@ private:
   template <class Mutex, class CondVar, typename D>
   std::unique_ptr<T, D> pri_synchronized_pop_unique(Mutex& mtx, CondVar& cv, D d)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     auto e = pop_unique(d);
     if (e)
     {
@@ -752,7 +751,7 @@ private:
   template <class Mutex, class CondVar, typename D>
   variant_ptr<T, D> pri_synchronized_pop_variant(Mutex& mtx, CondVar& cv, D d)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     auto e = pop_variant(d);
     if (e)
     {
@@ -786,7 +785,7 @@ private:
 
   void set_cache(gsl::owner<node_t*> n) noexcept
   {
-    Expects(cache_ == nullptr);
+    ACTORX_ASSERTS(cache_ == nullptr);
     cache_ = n;
   }
 

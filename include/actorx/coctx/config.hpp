@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "actorx/user.hpp"
-
-#include <gsl.h>
+#include "actorx/config.hpp"
+#include "actorx/assertion.hpp"
 
 
 #if defined(__WINDOWS__) || defined(_WIN32) || defined(__WIN32__) || defined(_WIN64)

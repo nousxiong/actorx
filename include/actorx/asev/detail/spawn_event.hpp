@@ -41,7 +41,7 @@ public:
   /// Inherit from asev::event_base.
   bool handle(thrctx_t& thrctx) override
   {
-    Expects(!!hdr_);
+    ACTORX_ASSERTS(!!hdr_);
     auto& pool = thrctx.get_event_pool<corctx_t>(corctx_make_t(thrctx.get_ev_service()));
     auto ev = cque::get_unique<corctx_t>(pool);
     ev->make_context(std::move(hdr_), ssize_);

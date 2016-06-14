@@ -58,7 +58,7 @@ UTEST_CASE_SEQ(210, test_mpsc_count)
       thr.join();
     }
 
-    Ensures(total == 0);
+    ACTORX_ENSURES(total == 0)(total);
 
     auto et = std::chrono::high_resolution_clock::now();
     auto time_span =

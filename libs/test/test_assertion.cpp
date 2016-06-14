@@ -18,7 +18,7 @@ struct usr_data
 namespace actorx
 {
 template <>
-struct tostring<usr_data>
+struct format<usr_data>
 {
   static fmt::MemoryWriter cast(usr_data const& v)
   {

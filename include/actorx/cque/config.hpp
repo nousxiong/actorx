@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include "actorx/user.hpp"
-
-#include <gsl.h>
+#include "actorx/config.hpp"
+#include "actorx/assertion.hpp"
 
 
 #ifndef CQUE_CACHE_LINE_SIZE

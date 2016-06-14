@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include "actorx/user.hpp"
+#include "actorx/config.hpp"
+#include "actorx/assertion.hpp"
 #include "actorx/coctx/all.hpp"
 #include "actorx/cque/all.hpp"
 #include "actorx/csegv/all.hpp"
-
-#include <gsl.h>
 
 
 #ifndef ASEV_MAX_EV_SERVICE

@@ -112,7 +112,7 @@ private:
 
   void set_cache(node_t* n) noexcept
   {
-    Expects(cache_ == nullptr);
+    ACTORX_ASSERTS(cache_ == nullptr);
     cache_ = n;
   }
 

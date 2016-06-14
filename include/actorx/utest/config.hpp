@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "actorx/user.hpp"
+#include "actorx/config.hpp"
+#include "actorx/assertion.hpp"
 #include "actorx/csegv/all.hpp"
-
-#include <gsl.h>

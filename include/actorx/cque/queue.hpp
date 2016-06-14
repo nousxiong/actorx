@@ -61,7 +61,7 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(!e->shared());
+      ACTORX_ASSERTS(!e->shared());
       e->free_unique();
     }
     return e;
@@ -75,8 +75,8 @@ public:
       return;
     }
 
-    Expects(!e->shared());
-    Expects(!e->unique());
+    ACTORX_ASSERTS(!e->shared());
+    ACTORX_ASSERTS(!e->unique());
     pri_push(e);
   }
 
@@ -89,10 +89,10 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(e->shared());
-      Expects(!e->unique());
+      ACTORX_ASSERTS(e->shared());
+      ACTORX_ASSERTS(!e->unique());
       auto ptr = e->free_shared();
-      Ensures(ptr);
+      ACTORX_ASSERTS(!!ptr);
       return std::move(std::static_pointer_cast<T>(ptr));
     }
     return std::shared_ptr<T>();
@@ -107,8 +107,8 @@ public:
     }
 
     auto p = e.get();
-    Expects(!p->shared());
-    Expects(!p->unique());
+    ACTORX_ASSERTS(!p->shared());
+    ACTORX_ASSERTS(!p->unique());
     p->retain(std::move(e));
     pri_push(p);
   }
@@ -123,7 +123,7 @@ public:
     auto e = pri_pop();
     if (e != nullptr)
     {
-      Expects(!e->shared());
+      ACTORX_ASSERTS(!e->shared());
       e->free_unique();
     }
     return std::move(std::unique_ptr<T, D>(e, d));
@@ -139,8 +139,8 @@ public:
     }
 
     auto p = e.release();
-    Expects(!p->shared());
-    Expects(!p->unique());
+    ACTORX_ASSERTS(!p->shared());
+    ACTORX_ASSERTS(!p->unique());
     p->retain();
     pri_push(p);
   }
@@ -154,21 +154,21 @@ public:
     {
       if (e->shared())
       {
-        Expects(!e->unique());
+        ACTORX_ASSERTS(!e->unique());
         auto ptr = e->free_shared();
-        Ensures(ptr);
+        ACTORX_ASSERTS(!!ptr);
         return std::move(variant_ptr<T, D>(std::static_pointer_cast<T>(ptr)));
       }
       else if (e->unique())
       {
-        Expects(!e->shared());
+        ACTORX_ASSERTS(!e->shared());
         e->free_unique();
         return std::move(variant_ptr<T, D>(std::unique_ptr<T, D>(e)));
       }
       else
       {
-        Expects(!e->unique());
-        Expects(!e->shared());
+        ACTORX_ASSERTS(!e->unique());
+        ACTORX_ASSERTS(!e->shared());
         return std::move(variant_ptr<T, D>(e));
       }
     }
@@ -187,19 +187,18 @@ private:
     head_ = e->fetch_next();
     if (head_ == nullptr)
     {
-      Expects(e == tail_);
+      ACTORX_ASSERTS(e == tail_);
       tail_ = nullptr;
     }
     return (gsl::owner<T*>)e;
   }
 
-  void pri_push(gsl::owner<T*> e) noexcept
+  void pri_push(gsl::not_null<T*> e) noexcept
   {
-    Expects(e != nullptr);
     e->set_next(nullptr);
     if (tail_ == nullptr)
     {
-      Expects(head_ == nullptr);
+      ACTORX_ASSERTS(head_ == nullptr);
       head_ = e;
       tail_ = e;
       return;

@@ -61,6 +61,6 @@ UTEST_CASE(test_coctx)
   std::cout << "Back in main" << std::endl;
   main_ctx.jump(ctx);
   std::cout << "Back in main again" << std::endl;
-  Ensures(usr::i == 2);
+  ACTORX_ENSURES(usr::i == 2)(usr::i);
   std::cout << "done." << std::endl;
 }

@@ -96,7 +96,7 @@ public:
     {
       if (evp.tyidx_ == tyidx)
       {
-        Expects(!!evp.pool_);
+        ACTORX_EXPECTS(!!evp.pool_);
         return *gsl::narrow<event_pool_t*>(evp.pool_.get());
       }
     }

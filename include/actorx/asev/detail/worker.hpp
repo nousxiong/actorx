@@ -86,7 +86,7 @@ public:
       }
       catch (...)
       {
-        Ensures(false);
+        ACTORX_ENSURES(false);
       }
 
       if (is_auto)

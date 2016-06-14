@@ -52,15 +52,15 @@ public:
 
   thrctx_t& get_thrctx()
   {
-    Expects(thrctx_ != nullptr);
+    ACTORX_ASSERTS(thrctx_ != nullptr);
     return *thrctx_;
   }
 
   void yield()
   {
-    Expects(host_ctx_ != nullptr);
-    Expects(!!ctx_);
-    Expects(thrctx_ != nullptr);
+    ACTORX_ASSERTS(host_ctx_ != nullptr);
+    ACTORX_ASSERTS(!!ctx_);
+    ACTORX_ASSERTS(thrctx_ != nullptr);
     thrctx_->set_corctx(nullptr);
     ctx_->jump(*host_ctx_);
   }
@@ -120,8 +120,8 @@ public:
     thrctx_ = &thrctx;
     if (!stop_)
     {
-      Expects(!!hdr_);
-      Expects(!!ctx_);
+      ACTORX_ASSERTS(!!hdr_);
+      ACTORX_ASSERTS(!!ctx_);
       host_ctx_ = &evs_.get_hostctx(thrctx.get_index());
       thrctx.set_corctx(this);
       host_ctx_->jump(*ctx_);

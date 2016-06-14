@@ -44,8 +44,8 @@ UTEST_CASE_SEQ(200, test_queue)
     for (size_t i=0; i<count; ++i)
     {
       auto e = que.pop_unique<cque::pool_delete<data>>();
-      Ensures(e->i_ == i);
-      Ensures(e->str_ == "test string");
+      ACTORX_ENSURES(e->i_ == i)(e->i_)(i);
+      ACTORX_ENSURES(e->str_ == "test string")(e->str_)(i);
     }
 
     auto et = std::chrono::high_resolution_clock::now();

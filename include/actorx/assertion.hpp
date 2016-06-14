@@ -21,7 +21,7 @@
 namespace actorx
 {
 template <typename T>
-struct tostring
+struct format
 {
 };
 
@@ -460,26 +460,16 @@ public:
     return pri_set_var(v, name);
   }
 
-  /*template <typename T>
-  assertion& set_var(T const* const v, gsl::czstring name)
+  template<typename Rep, typename Ratio>
+  assertion& set_var(std::chrono::duration<Rep, Ratio> v, gsl::czstring name)
   {
-    str_.write("  ");
-    str_.write(name);
-    str_.write(" = ");
-    str_.write(boost::lexical_cast<strbuf_t>(v).cbegin());
-    str_.write("\n");
-    return *this;
-  }*/
+    return pri_set_var(v.count(), name);
+  }
 
   template <typename T>
   assertion& set_var(T const& v, gsl::czstring name)
   {
     typedef typename std::decay<T>::type param_t;
-//    typedef typename std::remove_const<
-//      typename std::remove_reference<
-//        typename std::remove_volatile<T>::type
-//        >::type
-//      >::type param_t;
 
     typedef typename std::conditional<
       std::is_enum<param_t>::value, enum_t, other_t
@@ -522,7 +512,7 @@ private:
     str_.write("  ");
     str_.write(name);
     str_.write(" = ");
-    str_.write(tostring<T>::cast(v).c_str());
+    str_.write(format<T>::cast(v).c_str());
     str_.write("\n");
     return *this;
   }

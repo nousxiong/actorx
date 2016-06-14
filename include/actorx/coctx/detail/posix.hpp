@@ -258,9 +258,8 @@ struct asm_init
 
 static void init_coctx()
 {
-  auto ai = asm_init::current();
-  Expects(ai != nullptr);
-  Expects(ai->null_ == 0);
+  gsl::not_null<asm_init*> ai = asm_init::current();
+  ACTORX_ASSERTS(ai->null_ == 0);
 
   auto& ctx = ai->ctx_;
   auto& cctx = ai->cctx_;
@@ -276,7 +275,7 @@ static void init_coctx()
   f((void*)arg);
 
   /// The new coro returned. bad. just abort() for now.
-  Ensures(false);
+  ACTORX_ENSURES(false);
 }
 
 /// Make coctx_asmctx.

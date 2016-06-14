@@ -75,7 +75,7 @@ UTEST_CASE(test_spawn)
             std::chrono::duration_cast<std::chrono::milliseconds>(
               std::chrono::system_clock::now() - bt
               );
-          Ensures(eclipse >= std::chrono::milliseconds(100));
+          ACTORX_ENSURES(eclipse >= std::chrono::milliseconds(100))(eclipse);
         }
 
         if (--count == 0)

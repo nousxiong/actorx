@@ -103,7 +103,7 @@ public:
   template <class Mutex, class CondVar, typename TimeDuration>
   std::pair<size_t, duration_t> synchronized_reset(Mutex& mtx, CondVar& cv, TimeDuration const& timeout)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto c = reset();
@@ -198,7 +198,7 @@ private:
   template <class Mutex, class CondVar>
   size_t pri_synchronized_reset(Mutex& mtx, CondVar& cv)
   {
-    Expects(!blocked());
+    ACTORX_ASSERTS(!blocked());
     auto c = reset();
     if (c != 0)
     {

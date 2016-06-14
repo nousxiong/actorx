@@ -149,7 +149,7 @@ static std::list<stack_info> get_stack_list(
 /// Using backtrace to get stack list.
 static std::list<stack_info> get_stack_list(size_t stack_depth)
 {
-  Expects(stack_depth <= 32);
+  ACTORX_ASSERTS(stack_depth <= 32);
 
   std::list<stack_info> stack_info_list;
   void* trace_buf[32];

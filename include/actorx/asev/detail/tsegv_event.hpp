@@ -42,8 +42,8 @@ public:
   /// Inherit from asev::event_base.
   bool handle(thrctx_t& thrctx) override
   {
-    Expects(!!hdr_);
-    Expects(stack_info_list_ != nullptr);
+    ACTORX_ASSERTS(!!hdr_);
+    ACTORX_ASSERTS(stack_info_list_ != nullptr);
     hdr_(thrctx, *stack_info_list_);
     return true;
   }

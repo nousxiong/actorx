@@ -23,6 +23,9 @@ option (ACTORX_DEBUG "If open debug logger" OFF)
 if (UNIX)
   option (ACTORX_STATIC "Build Actorx runtime static" OFF)
 endif ()
+set (ACTORX_ASIO_INCLUDEDIR "${PROJECT_SOURCE_DIR}/dependencies/asio" CACHE STRING "Include directory for asio")
+set (ACTORX_GSL_INCLUDEDIR "${PROJECT_SOURCE_DIR}/dependencies/gsl" CACHE STRING "Include directory for gsl")
+set (ACTORX_SPDLOG_INCLUDEDIR "${PROJECT_SOURCE_DIR}/dependencies/spdlog" CACHE STRING "Include directory for spdlog")
 
 mark_as_advanced (ACTORX_TEST_CSEGV)
 
@@ -42,9 +45,12 @@ if (ACTORX_STATIC)
   endif ()
 endif ()
 
-# Add the source and build tree to the search path for include actorx header files.
-include_directories (${PROJECT_SOURCE_DIR}/include)
+# Add the source and build tree to the search path for include actorx and dependencies header files.
+include_directories (${PROJECT_SOURCE_DIR})
 include_directories (${PROJECT_BINARY_DIR})
+include_directories (${ACTORX_ASIO_INCLUDEDIR})
+include_directories (${ACTORX_GSL_INCLUDEDIR})
+include_directories (${ACTORX_SPDLOG_INCLUDEDIR})
 
 # Find threads
 find_package (Threads)

@@ -22,7 +22,7 @@ endif ()
 
 if (ACTORX_DEV)
   # Set up all files.
-  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/include/actorx/*.hpp")
+  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/actorx/*.hpp")
   file (GLOB_RECURSE ACTORX_SOURCE_FILES "${PROJECT_SOURCE_DIR}/libs/src/src.cpp")
 
   # Actorx library for dev
@@ -31,7 +31,7 @@ endif ()
 
 # All headers need install include dependences.
 install (
-  DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION .
+  DIRECTORY ${PROJECT_SOURCE_DIR}/actorx DESTINATION actorx
   PATTERN "impl" EXCLUDE
   PATTERN "CVS" EXCLUDE
   PATTERN ".svn" EXCLUDE

@@ -31,12 +31,38 @@ endif ()
 
 # All headers need install include dependences.
 install (
-  DIRECTORY ${PROJECT_SOURCE_DIR}/actorx DESTINATION actorx
+  DIRECTORY ${PROJECT_SOURCE_DIR}/actorx DESTINATION include
   PATTERN "impl" EXCLUDE
   PATTERN "CVS" EXCLUDE
   PATTERN ".svn" EXCLUDE
   PATTERN "lua" EXCLUDE
   )
+
+if (ACTORX_INSTALL_DEPENDENCIES)
+  install (
+    DIRECTORY ${ACTORX_ASIO_INCLUDEDIR}/ DESTINATION include
+    PATTERN "impl" EXCLUDE
+    PATTERN "CVS" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "lua" EXCLUDE
+    )
+
+  install (
+    DIRECTORY ${ACTORX_GSL_INCLUDEDIR}/ DESTINATION include
+    PATTERN "impl" EXCLUDE
+    PATTERN "CVS" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "lua" EXCLUDE
+    )
+
+  install (
+    DIRECTORY ${ACTORX_SPDLOG_INCLUDEDIR}/ DESTINATION include
+    PATTERN "impl" EXCLUDE
+    PATTERN "CVS" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "lua" EXCLUDE
+    )
+endif ()
 
 if (ACTORX_STATIC)
   set (ACTORX_LINK_PROPS "${ACTORX_LINK_PROPS} -static -static-libgcc -static-libstdc++")

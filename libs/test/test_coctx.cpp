@@ -1,6 +1,6 @@
-///
-/// Test coctx.
-///
+//
+// Test coctx.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/coctx/all.hpp>

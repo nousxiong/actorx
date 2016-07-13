@@ -1,6 +1,6 @@
-///
-/// Test mpsc_queue.
-///
+//
+// Test mpsc_queue.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/cque/all.hpp>

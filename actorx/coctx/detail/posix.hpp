@@ -1,6 +1,6 @@
-///
-/// posix.hpp
-///
+//
+// posix.hpp
+//
 
 #pragma once
 
@@ -69,10 +69,10 @@ static size_t coctx_pagesize()
 #endif
 
 
-/// Context's func.
+// Context's func.
 typedef void (*coctx_func)(void*);
 
-/// coctx's asm context.
+// coctx's asm context.
 struct coctx_asmctx
 {
   coctx_asmctx()
@@ -80,13 +80,13 @@ struct coctx_asmctx
   {
   }
 
-  /// Must be at offset 0.
+  // Must be at offset 0.
   void** sp_;
 };
 
 extern "C"
 {
-/// coctx_transfer
+//! coctx_transfer
 /**
  * The following prototype defines the coroutine switching function.
  * This function is thread-safe and reentrant.
@@ -97,7 +97,7 @@ void __attribute__ ((__noinline__, __regparm__(2)))
 
 asm(
   "\t.text\n"
-  /// Can't use .globl bcz multi modules will redefine coctx_transfer.
+  // Can't use .globl bcz multi modules will redefine coctx_transfer.
   "\t.extern coctx_transfer\n"
   "coctx_transfer:\n"
 #if __amd64
@@ -142,7 +142,7 @@ namespace coctx
 {
 namespace detail
 {
-/// Context's stack.
+// Context's stack.
 class stack
 {
   stack(stack const&) = delete;
@@ -169,13 +169,13 @@ public:
     auto err = std::make_error_code(std::errc::not_enough_memory);
 
 #if COCTX_MMAP
-    /// mmap supposedly does allocate-on-write for us.
+    // mmap supposedly does allocate-on-write for us.
     sptr = mmap(0, ssze, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     if (sptr == (void*)-1)
     {
-      /// Some systems don't let us have executable heap.
-      /// We assume they won't need executable stack in that case.
+      // Some systems don't let us have executable heap.
+      // We assume they won't need executable stack in that case.
       sptr = mmap(0, ssze, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
       if (sptr == (void*)-1)
@@ -230,7 +230,7 @@ private:
   size_t size_;
 };
 
-/// For asm init data.
+// For asm init data.
 struct asm_init
 {
   static asm_init* current() noexcept
@@ -240,7 +240,7 @@ struct asm_init
 
   static asm_init* current(asm_init&& ai) noexcept
   {
-    /// Local asm_init.
+    // Local asm_init.
     static thread_local asm_init local_ai{1};
     if (ai.null_ == 0)
     {
@@ -274,11 +274,11 @@ static void init_coctx()
 
   f((void*)arg);
 
-  /// The new coro returned. bad. just abort() for now.
+  // The new coro returned. bad. just abort() for now.
   ACTORX_ENSURES(false);
 }
 
-/// Make coctx_asmctx.
+//! Make coctx_asmctx.
 /**
  * @param stk stack struck.
  * @param f coctx function.
@@ -287,7 +287,7 @@ static void init_coctx()
  */
 static coctx_asmctx make_coctx(stack& stk, coctx_func f, void* arg)
 {
-  /// Init asm_init.
+  // Init asm_init.
   auto ai = asm_init::current(asm_init{0});
   ai->f_ = f;
   ai->arg_ = arg;
@@ -296,7 +296,7 @@ static coctx_asmctx make_coctx(stack& stk, coctx_func f, void* arg)
   auto ssize = stk.size();
 
   ai->ctx_.sp_ = (void**)(ssize + (char*)sptr);
-  *--ai->ctx_.sp_ = (void*)std::abort; /// Needed for alignment only.
+  *--ai->ctx_.sp_ = (void*)std::abort; // Needed for alignment only.
   *--ai->ctx_.sp_ = (void*)init_coctx;
   ai->ctx_.sp_ -= COCTX_NUM_SAVED;
   std::memset(ai->ctx_.sp_, 0, sizeof(*ai->ctx_.sp_) * COCTX_NUM_SAVED);
@@ -304,5 +304,5 @@ static coctx_asmctx make_coctx(stack& stk, coctx_func f, void* arg)
   coctx_transfer(&ai->cctx_, &ai->ctx_);
   return ai->ctx_;
 }
-} /// namespace detail
-} /// namespace coctx
+} // namespace detail
+} // namespace coctx

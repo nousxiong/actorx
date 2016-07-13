@@ -1,6 +1,6 @@
-///
-/// node.hpp
-///
+//
+// node.hpp
+//
 
 #pragma once
 

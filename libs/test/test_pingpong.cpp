@@ -1,6 +1,6 @@
-///
-/// Test pingpong.
-///
+//
+// Test pingpong.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/asev/all.hpp>
@@ -84,7 +84,7 @@ UTEST_CASE(test_pingpong)
           {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-            /// Start one new ut.
+            // Start one new ut.
             snds_.front().post(
               [this](asev::thrctx_t& thrctx)
               {
@@ -156,7 +156,7 @@ UTEST_CASE(test_pingpong)
     });
 
   auto bt = ut_clock_t::now();
-  /// Start ev_service.
+  // Start ev_service.
   evs.run();
   auto et = ut_clock_t::now();
 

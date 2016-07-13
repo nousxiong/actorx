@@ -1,6 +1,6 @@
-///
-/// config.hpp
-///
+//
+// config.hpp
+//
 
 #pragma once
 

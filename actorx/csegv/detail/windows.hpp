@@ -1,6 +1,6 @@
-///
-/// windows.hpp
-///
+//
+// windows.hpp
+//
 
 #pragma once
 
@@ -199,13 +199,13 @@ struct context
     return ctx;
   }
 
-  /// Local templ vars.
+  // Local templ vars.
   size_t stack_depth_;
   bool brief_;
   handler_t h_;
 };
 
-/// SEH 's filter function.
+// SEH 's filter function.
 static int seh_filter(LPEXCEPTION_POINTERS exinfo)
 {
   auto& ctx = context::get();
@@ -265,5 +265,5 @@ static void pcall_impl(F&& f)
     std::exit(102);
   }
 }
-} /// namespace detail
-} /// namespace csegv
+} // namespace detail
+} // namespace csegv

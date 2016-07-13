@@ -1,6 +1,6 @@
-///
-/// Test queue.
-///
+//
+// Test queue.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/cque/all.hpp>

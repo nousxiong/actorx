@@ -1,6 +1,6 @@
-///
-/// Test mpsc_counter.
-///
+//
+// Test mpsc_counter.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/cque/all.hpp>

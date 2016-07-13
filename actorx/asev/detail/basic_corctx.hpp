@@ -1,6 +1,6 @@
-///
-/// basic_corctx.hpp
-///
+//
+// basic_corctx.hpp
+//
 
 #pragma once
 
@@ -85,7 +85,7 @@ public:
   }
 
 public:
-  /// Internal use.
+  // Internal use.
   void make_context(coro_handler_t hdr, coctx::stack_size ssize = coctx::make_stacksize())
   {
     hdr_ = std::move(hdr);
@@ -95,7 +95,7 @@ public:
         new coctx::context(
           [this](coctx::context&)
           {
-            /// Handler coroutine.
+            // Handler coroutine.
             try
             {
               hdr_(*this);
@@ -104,7 +104,7 @@ public:
             {
             }
 
-            /// End self and yield.
+            // End self and yield.
             stop_ = true;
             snd_.async(this);
             yield();
@@ -128,7 +128,7 @@ public:
     }
     else
     {
-      /// Release self to pool.
+      // Release self to pool.
       cque::node_base::release();
     }
     return false;
@@ -147,7 +147,7 @@ public:
     hdr_ = coro_handler_t();
     thrctx_ = nullptr;
     affix_ = nullptr;
-    /// No need reset, bcz ctx will reuse.
+    // No need reset, bcz ctx will reuse.
 //    ctx_.reset();
   }
 
@@ -179,6 +179,6 @@ struct corctx_make
 
   EvService& evs_;
 };
-} /// namespace detail
-} /// namespace asev
+} // namespace detail
+} // namespace asev
 

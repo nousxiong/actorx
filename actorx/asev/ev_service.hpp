@@ -1,6 +1,6 @@
-///
-/// ev_service.hpp
-///
+//
+// ev_service.hpp
+//
 
 #pragma once
 
@@ -34,7 +34,7 @@
 
 namespace asev
 {
-/// Provides async event functionality.
+//! Provides async event functionality.
 class ev_service
 {
   using strand_t = detail::basic_strand<ev_service>;
@@ -101,25 +101,25 @@ public:
 
     thread_num = thread_num == 0 ? 1 : thread_num;
 
-    /// Worker num must >= thread_num
+    // Worker num must >= thread_num
     if (worker_num < thread_num)
     {
       worker_num = thread_num;
     }
 
-    /// Make thread data.
+    // Make thread data.
     for (size_t i=0; i<thread_num; ++i)
     {
       thread_data_list_.emplace_back(std::ref(*this), i, logger_);
     }
 
-    /// Make workers.
+    // Make workers.
     for (size_t i=0; i<worker_num; ++i)
     {
       worker_list_.emplace_back(worker_num, i);
     }
 
-    /// Push all workers into workshop_.
+    // Push all workers into workshop_.
     for (auto& wkr : worker_list_)
     {
       workshop_.emplace_back(&wkr);
@@ -128,7 +128,7 @@ public:
 
   ~ev_service()
   {
-    /// Clean up all misc.
+    // Clean up all misc.
     for (auto& thrdat : thread_data_list_)
     {
       while (true)
@@ -180,19 +180,19 @@ public:
   }
 
 public:
-  /// Get thread num.
+  //! Get thread num.
   inline size_t get_thread_num() const noexcept
   {
     return thread_data_list_.size();
   }
 
-  /// Get worker num.
+  //! Get worker num.
   inline size_t get_worker_num() const noexcept
   {
     return worker_list_.size();
   }
 
-  /// Post a handler into background thread pool to run.
+  //! Post a handler into background thread pool to run.
   /**
    * @param f Handler that will be posted.
    */
@@ -202,14 +202,14 @@ public:
     pri_post(select_strand_index(), post_handler_t(f));
   }
 
-  /// Spawn an coroutine into background thread pool.
+  //! Spawn an coroutine into background thread pool.
   template <typename F>
   void spawn(F&& f, coctx::stack_size ssize = coctx::make_stacksize())
   {
     pri_spawn(select_strand_index(), coro_handler_t(f), ssize);
   }
 
-  /// Add an user defined event into background thread pool to run.
+  //! Add an user defined event into background thread pool to run.
   /**
    * @param ev User defined event.
    */
@@ -218,7 +218,7 @@ public:
     pri_async(select_strand_index(), ev);
   }
 
-  /// Post a handler into all background threads to run when their start.
+  //! Post a handler into all background threads to run when their start.
   /**
    * @param f Handler that will run when each background thread start.
    */
@@ -228,7 +228,7 @@ public:
     pri_tstart(tstart_handler_t(f));
   }
 
-  /// Post a handler into all background threads to run when their exit.
+  //! Post a handler into all background threads to run when their exit.
   /**
    * @param f Handler that will run when each background thread exit.
    */
@@ -238,7 +238,7 @@ public:
     pri_texit(texit_handler_t(f));
   }
 
-  /// Post a handler into all background threads to run when catched segv.
+  //! Post a handler into all background threads to run when catched segv.
   /**
   * @param f Handler that will run when catched segv.
   */
@@ -248,7 +248,7 @@ public:
     pri_tsegv(tsegv_handler_t(f));
   }
 
-  /// Make an event using thread_local pool.
+  //! Make an event using thread_local pool.
   template <typename Event, typename PoolMake = cque::pool_make<Event>>
   gsl::owner<Event*> make_event(PoolMake pmk = PoolMake{})
   {
@@ -258,7 +258,7 @@ public:
     event_pool_t* pool = nullptr;
     if (thrctx == nullptr)
     {
-      /// Non-trivial object with thread_local storage hasn't been implemented in gcc yet.
+      // Non-trivial object with thread_local storage hasn't been implemented in gcc yet.
       static thread_local thread_local_pool_array pool_array{0};
       if (pool_array.size_ == 0)
       {
@@ -290,10 +290,10 @@ public:
     return cque::get<Event>(*pool);
   }
 
-  /// Start ev_service to run and block current thread to wait for stop.
+  //! Start ev_service to run and block current thread to wait for stop.
   void run()
   {
-    /// Start thread_pool.
+    // Start thread_pool.
     std::vector<std::thread> thread_pool;
     auto thread_num = thread_data_list_.size();
     thread_pool.reserve(thread_num);
@@ -313,7 +313,7 @@ public:
               },
               [this, &thrdat, &thrctx, i](std::list<csegv::stack_info> const& stack_info_list)
               {
-                /// Run all tsegv event.
+                // Run all tsegv event.
                 int count = 0;
                 while (true)
                 {
@@ -359,20 +359,20 @@ public:
         );
     }
 
-    /// Wait for join.
+    // Wait for join.
     for (auto& thr : thread_pool)
     {
       thr.join();
     }
 
-    /// Clear thread pool.
+    // Clear thread pool.
     thread_pool.clear();
   }
 
-  /// Stop ev_service.
+  //! Stop ev_service.
   void stop()
   {
-    /// Stop all thread.
+    // Stop all thread.
     for (auto& thrdat : thread_data_list_)
     {
       thrdat.stop_ = true;
@@ -384,7 +384,7 @@ public:
     }
   }
 
-  /// Get current thrctx.
+  //! Get current thrctx.
   static thrctx_t* current()
   {
     return pri_current(nullptr);
@@ -398,7 +398,7 @@ private:
     auto const thread_num = thread_data_list_.size();
     auto const worker_num = worker_list_.size();
 
-    /// Get prior, minor and inferior workers.
+    // Get prior, minor and inferior workers.
     std::vector<size_t> priors;
     std::vector<size_t> minors;
     for (size_t n = 0; n<worker_num; ++n)
@@ -414,7 +414,7 @@ private:
       }
     }
 
-    /// Run all tstart event.
+    // Run all tstart event.
     while (true)
     {
       auto ev = thrdat.tstart_que_.pop();
@@ -439,7 +439,7 @@ private:
       }
     }
 
-    /// Set callback to run all texit.
+    // Set callback to run all texit.
     auto texit = gsl::finally(
       [&thrdat, &thrctx]()
     {
@@ -468,15 +468,15 @@ private:
       }
     });
 
-    /// Poll loop sleep duration.
+    // Poll loop sleep duration.
     std::chrono::microseconds const poll_sleep_dur{ 50 };
 
-    /// Work loop.
+    // Work loop.
     while (!thrdat.is_stop())
     {
       try
       {
-        /// First try aggressive polling.
+        // First try aggressive polling.
         for (size_t i = 0; i<100; ++i)
         {
           if (thrdat.cnt_.reset() > 0)
@@ -485,7 +485,7 @@ private:
           }
         }
 
-        /// Then moderate polling.
+        // Then moderate polling.
         for (size_t i = 0; i<500; ++i)
         {
           if (thrdat.cnt_.reset() > 0 || thrdat.is_stop())
@@ -495,7 +495,7 @@ private:
           std::this_thread::sleep_for(poll_sleep_dur);
         }
 
-        /// Finally waiting notify.
+        // Finally waiting notify.
         thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
 
       do_job:
@@ -509,15 +509,15 @@ private:
         ACTORX_ENSURES(false);
       }
 
-      /// Firstly try run prior workers.
+      // Firstly try run prior workers.
       size_t pworks = 0;
       for (auto n : priors)
       {
-        /// Try pop a worker to run.
+        // Try pop a worker to run.
         pworks += do_work(n, thrctx, work_level::prior);
       }
 
-      /// @todo works dynamic load balance.
+      // @todo works dynamic load balance.
       if (pworks > 0)
       {
         continue;
@@ -525,7 +525,7 @@ private:
 
       for (auto n : minors)
       {
-        /// Try pop a worker to run.
+        // Try pop a worker to run.
         do_work(n, thrctx, work_level::minor);
       }
     }
@@ -537,16 +537,16 @@ private:
     auto wkr = workshop_[wkridx].exchange(nullptr, std::memory_order_acq_rel);
     if (wkr != nullptr)
     {
-      /// Set current worker.
+      // Set current worker.
       thrctx.set_worker(wkr);
       auto _ = gsl::finally(
         [this, wkridx, wkr, &thrctx]()
         {
           thrctx.set_worker(nullptr);
           workshop_[wkridx].store(wkr, std::memory_order_release);
-          /// @note This must call, bcz before set wkr, there may be new event add into
-          ///   this worker, but this worker's thread may exchange nullptr, so events may
-          ///   be omited.
+          // @note This must call, bcz before set wkr, there may be new event add into
+          //   this worker, but this worker's thread may exchange nullptr, so events may
+          //   be omited.
           notify_thread(wkridx);
         });
       works += wkr->work(thrctx, wlv);
@@ -556,7 +556,7 @@ private:
 
   static thrctx_t* pri_current(thrctx_t* thrctx = nullptr)
   {
-    /// Local private thrctx.
+    // Local private thrctx.
     static thread_local thrctx_t* local_thrctx = nullptr;
     if (local_thrctx == nullptr && thrctx != nullptr)
     {
@@ -647,18 +647,18 @@ private:
   }
 
 private:
-  /// Local process unique id.
+  // Local process unique id.
   uid_t uid_;
 
-  /// Logger.
+  // Logger.
   logger_ptr logger_;
 
-  /// Thread local pool.
+  // Thread local pool.
   struct thread_local_pool : public cque::node_base
   {
     std::unique_ptr<cque::pool_base> pool_;
   };
-  /// Thread local pool array.
+  // Thread local pool array.
   struct thread_local_pool_array
   {
     size_t size_;
@@ -667,7 +667,7 @@ private:
   using local_pool_queue_t = cque::mpsc_queue<thread_local_pool, eclipse_clock_t>;
   local_pool_queue_t local_pool_queue_;
 
-  /// Each thread has a data.
+  // Each thread has a data.
   struct thread_data
   {
     thread_data(ev_service& evs, size_t index, logger_ptr logger)
@@ -694,7 +694,7 @@ private:
   };
   std::deque<thread_data> thread_data_list_;
 
-  /// Workers.
+  // Workers.
   std::deque<detail::worker> worker_list_;
   std::deque<worker_ptr> workshop_;
 

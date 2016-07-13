@@ -1,6 +1,6 @@
-///
-/// worker.hpp
-///
+//
+// worker.hpp
+//
 
 #pragma once
 
@@ -14,7 +14,7 @@
 
 namespace asev
 {
-/// Work level.
+//! Work level.
 enum work_level
 {
   prior,
@@ -24,7 +24,7 @@ enum work_level
 namespace detail
 {
 
-/// Worker for handling events.
+//! Worker for handling events.
 class worker
 {
 #ifdef ASEV_SYSTEM_CLOCK
@@ -68,13 +68,13 @@ public:
   size_t work(basic_thrctx<EvService>& thrctx, work_level wlv) noexcept
   {
     size_t works = 0;
-    /// Event loop.
+    // Event loop.
     while (true)
     {
       auto ev = que_.pop();
       if (ev == nullptr)
       {
-        /// @todo improve loop strategy.
+        // @todo improve loop strategy.
         break;
       }
 
@@ -95,7 +95,7 @@ public:
       }
     }
 
-    /// Update works.
+    // Update works.
     switch (wlv)
     {
     case work_level::prior: pworks_ += works; break;
@@ -118,7 +118,7 @@ private:
   size_t index_;
   cque::mpsc_queue<event_base, eclipse_clock_t> que_;
 
-  /// Status.
+  //! Status.
   int64_t pworks_;
   int64_t mworks_;
 };

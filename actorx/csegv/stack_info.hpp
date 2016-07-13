@@ -1,6 +1,6 @@
-///
-/// stack_info.hpp
-///
+//
+// stack_info.hpp
+//
 
 #pragma once
 
@@ -15,13 +15,13 @@
 
 namespace csegv
 {
-/// Forward declare.
+// Forward declare.
 struct stack_info;
 
-/// Segv's handler.
+// Segv's handler.
 using handler_t = std::function<void (std::list<stack_info> const&)>;
 
-/// Stack info.
+//! Stack info.
 struct stack_info
 {
   stack_info(bool brief = true)
@@ -87,4 +87,4 @@ struct stack_info
   std::string module_;
   std::string symbol_;
 };
-} /// namespace csegv
+} // namespace csegv

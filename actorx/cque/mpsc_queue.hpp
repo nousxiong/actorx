@@ -1,6 +1,6 @@
-///
-/// mpsc_queue.hpp
-///
+//
+// mpsc_queue.hpp
+//
 
 #pragma once
 
@@ -18,7 +18,7 @@
 
 namespace cque
 {
-/// Intrusive multi-producers one consumer queue.
+//! Intrusive multi-producers one consumer queue.
 /**
  * @par Wait-free.
  */
@@ -61,7 +61,7 @@ public:
   }
 
 public:
-  /// Pop an element from tail.
+  //! Pop an element from tail.
   /**
    * @note Only call in single-consumer thread.
    */
@@ -76,7 +76,7 @@ public:
     return e;
   }
 
-  /// Push an element at head.
+  //! Push an element at head.
   void push(gsl::owner<T*> e) noexcept
   {
     if (e == nullptr)
@@ -89,7 +89,7 @@ public:
     pri_push(e);
   }
 
-  /// Push an element at head, if queue blocking invoke given functor.
+  //! Push an element at head, if queue blocking invoke given functor.
   /**
    * @param f A functor invoke on blocking.
    */
@@ -103,7 +103,7 @@ public:
     }
   }
 
-  /// Synchronized push an element at head, if queue blocking, wake up it.
+  //! Synchronized push an element at head, if queue blocking, wake up it.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waking up.
@@ -120,8 +120,8 @@ public:
       });
   }
 
-  /// Synchronized pop an element from queue, if queue is empty,
-  /// Block current thread until any element pushed.
+  //! Synchronized pop an element from queue, if queue is empty,
+  //! Block current thread until any element pushed.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -133,8 +133,8 @@ public:
     return pri_synchronized_pop(mtx, cv);
   }
 
-  /// Synchronized pop an element from queue, if queue is empty,
-  /// block current thread for given time until any element pushed or timed out.
+  //! Synchronized pop an element from queue, if queue is empty,
+  //! block current thread for given time until any element pushed or timed out.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -205,7 +205,7 @@ public:
     return std::make_pair(e, final_eclipse);
   }
 
-  /// Pop an shared_ptr element from tail.
+  //! Pop an shared_ptr element from tail.
   /**
    * @note Only call in single-consumer thread.
    */
@@ -223,8 +223,8 @@ public:
     return std::shared_ptr<T>();
   }
 
-  /// Synchronized pop an shared_ptr element from queue, if queue is empty,
-  /// block current thread until any element pushed.
+  //! Synchronized pop an shared_ptr element from queue, if queue is empty,
+  //! block current thread until any element pushed.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -236,8 +236,8 @@ public:
     return pri_synchronized_pop_shared(mtx, cv);
   }
 
-  /// Synchronized pop an shared_ptr element from queue, if queue is empty,
-  /// block current thread for given time until any element pushed or timed out.
+  //! Synchronized pop an shared_ptr element from queue, if queue is empty,
+  //! block current thread for given time until any element pushed or timed out.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -309,7 +309,7 @@ public:
     return std::make_pair(std::move(e), final_eclipse);
   }
 
-  /// Push an shared_ptr element at head.
+  // Push an shared_ptr element at head.
   void push(std::shared_ptr<T> e) noexcept
   {
     if (!e)
@@ -324,7 +324,7 @@ public:
     pri_push(p);
   }
 
-  /// Push an shared_ptr element at head, if queue blocking invoke given functor.
+  //! Push an shared_ptr element at head, if queue blocking invoke given functor.
   /**
    * @param f A functor invoke on blocking.
    */
@@ -338,7 +338,7 @@ public:
     }
   }
 
-  /// Synchronized push an shared_ptr element at head, if queue blocking, wake up it.
+  //! Synchronized push an shared_ptr element at head, if queue blocking, wake up it.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waking up.
@@ -355,7 +355,7 @@ public:
       });
   }
 
-  /// Pop an unique_ptr element from tail.
+  //! Pop an unique_ptr element from tail.
   /**
    * @note Only call in single-consumer thread.
    */
@@ -371,8 +371,8 @@ public:
     return std::move(std::unique_ptr<T, D>(e, d));
   }
 
-  /// Synchronized pop an unique_ptr element from queue, if queue is empty,
-  /// block current thread until any element pushed.
+  //! Synchronized pop an unique_ptr element from queue, if queue is empty,
+  //! block current thread until any element pushed.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -385,8 +385,8 @@ public:
     return pri_synchronized_pop_unique(mtx, cv, d);
   }
 
-  /// Synchronized pop an unique_ptr element from queue, if queue is empty,
-  /// block current thread for given time until any element pushed or timed out.
+  //! Synchronized pop an unique_ptr element from queue, if queue is empty,
+  //! block current thread for given time until any element pushed or timed out.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -459,7 +459,7 @@ public:
     return std::make_pair(std::move(e), final_eclipse);
   }
 
-  /// Push an unique_ptr element at head.
+  // Push an unique_ptr element at head.
   template <typename D>
   void push(std::unique_ptr<T, D>&& e) noexcept
   {
@@ -475,7 +475,7 @@ public:
     pri_push(p);
   }
 
-  /// Push an unique_ptr element at head, if queue blocking invoke given functor.
+  //! Push an unique_ptr element at head, if queue blocking invoke given functor.
   /**
    * @param f A functor invoke on blocking.
    */
@@ -489,7 +489,7 @@ public:
     }
   }
 
-  /// Synchronized push an unique_ptr element at head, if queue blocking, wake up it.
+  //! Synchronized push an unique_ptr element at head, if queue blocking, wake up it.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waking up.
@@ -506,7 +506,7 @@ public:
       });
   }
 
-  /// Pop a variant_ptr element at tail.
+  // Pop a variant_ptr element at tail.
   template <typename D = std::default_delete<T>>
   variant_ptr<T, D> pop_variant(D d = D()) noexcept
   {
@@ -536,8 +536,8 @@ public:
     return std::move(variant_ptr<T, D>());
   }
 
-  /// Synchronized pop an variant_ptr element from queue, if queue is empty,
-  /// block current thread until any element pushed.
+  //! Synchronized pop an variant_ptr element from queue, if queue is empty,
+  //! block current thread until any element pushed.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -550,8 +550,8 @@ public:
     return pri_synchronized_pop_variant(mtx, cv, d);
   }
 
-  /// Synchronized pop an variant_ptr element from queue, if queue is empty,
-  /// block current thread for given time until any element pushed or timed out.
+  //! Synchronized pop an variant_ptr element from queue, if queue is empty,
+  //! block current thread for given time until any element pushed or timed out.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -648,7 +648,7 @@ private:
       e = head_.exchange(nullptr, std::memory_order_acquire);
       if (e != nullptr && e->get_next() != nullptr)
       {
-        /// reverse
+        // reverse
         auto last = e;
         node_t* first = nullptr;
         while (last != nullptr)
@@ -666,7 +666,7 @@ private:
     return gsl::narrow_cast<gsl::owner<T*>>(e);
   }
 
-  /// Push an element at head.
+  // Push an element at head.
   void pri_push(gsl::not_null<T*> e) noexcept
   {
     auto stale_head = head_.load(std::memory_order_relaxed);
@@ -790,12 +790,12 @@ private:
   }
 
 private:
-  /// Ensure occupy entire cache(s) line.
+  // Ensure occupy entire cache(s) line.
   char pad_[CQUE_CACHE_LINE_SIZE];
   CQUE_CACHE_ALIGNED_VAR(std::atomic<gsl::owner<node_t*>>, head_);
   CQUE_CACHE_ALIGNED_VAR(std::atomic_bool, blocked_);
 
-  /// Only access by owner(pop thread).
+  // Only access by owner(pop thread).
   gsl::owner<node_t*> cache_;
 };
 }

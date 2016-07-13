@@ -1,6 +1,6 @@
-///
-/// threv_base.hpp
-///
+//
+// threv_base.hpp
+//
 
 #pragma once
 
@@ -10,7 +10,7 @@
 
 namespace asev
 {
-/// Thread event base class.
+//! Thread event base class.
 struct threv_base : public event_base
 {
   threv_base() {}

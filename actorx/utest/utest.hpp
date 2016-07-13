@@ -1,6 +1,6 @@
-///
-/// utest.hpp
-///
+//
+// utest.hpp
+//
 
 #pragma once
 
@@ -26,7 +26,7 @@ struct ucase
 
 class context
 {
-  /// Private construtor to ensure that there is no way there could be more than one context.
+  //! Private construtor to ensure that there is no way there could be more than one context.
   context() {}
 
   context(context const&) = delete;
@@ -104,7 +104,7 @@ public:
       }
     }
 
-    /// Begin utest loop.
+    // Begin utest loop.
     csegv::pcall(
       [this]()
       {
@@ -182,7 +182,7 @@ private:
   int total_loop_;
 };
 
-/// Helper function.
+//! Helper function.
 static context& get()
 {
   return context::instance();
@@ -218,9 +218,9 @@ struct auto_enable
     get().add_enabled(std::move(name));
   }
 };
-} /// namespace utest
+} // namespace utest
 
-/// Add an test case named by case_name.
+//! Add an test case named by case_name.
 #define UTEST_CASE(case_name) \
   static void utest_##case_name##_f(); \
   namespace \
@@ -237,28 +237,28 @@ struct auto_enable
   } \
   static void utest_##case_name##_f()
 
-/// Add an test case with priority, those cases prior all the others.
+//! Add an test case with priority, those cases prior all the others.
 #define UTEST_CASE_SEQ(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, false)
 
-/// Add an test case will be run after all the others.
+//! Add an test case will be run after all the others.
 #define UTEST_CASE_FINAL(priority, case_name) UTEST_CASE_SEQ_IMPL(priority, case_name, true)
 
-/// Disable given test case.
+//! Disable given test case.
 #define UTEST_DISABLE(case_name) \
   namespace \
   { \
     utest::auto_disable utest_##case_name##_ad(#case_name); \
   }
 
-/// When use this macro, all case will be disabled and only this macro's case(s)
-/// BUT not in disabled_list can run.
+//! When use this macro, all case will be disabled and only this macro's case(s)
+//! BUT not in disabled_list can run.
 #define UTEST_ENABLE(case_name) \
   namespace \
   { \
     utest::auto_enable utest_##case_name##_ae(#case_name); \
   }
 
-/// User must use this macro in one and only one cpp file.
+//! User must use this macro in one and only one cpp file.
 #define UTEST_MAIN \
   int main() \
   { \

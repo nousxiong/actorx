@@ -1,6 +1,6 @@
-///
-/// event_base.hpp
-///
+//
+// event_base.hpp
+//
 
 #pragma once
 
@@ -9,7 +9,7 @@
 
 namespace asev
 {
-/// Forward declares.
+// Forward declares.
 class ev_service;
 
 namespace detail
@@ -18,7 +18,7 @@ template <class>
 class basic_thrctx;
 }
 
-/// Event base class.
+//! Event base class.
 struct event_base : public cque::node_base
 {
   using thrctx_t = detail::basic_thrctx<ev_service>;
@@ -26,7 +26,7 @@ struct event_base : public cque::node_base
   event_base() {}
   virtual ~event_base() {}
 
-  /// Handle this event.
+  //! Handle this event.
   /**
    * @return true will release event, false leave it to user.
    * @note If throw a exception event will be released.

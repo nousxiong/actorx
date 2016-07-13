@@ -1,6 +1,6 @@
-///
-/// basic_thrctx.hpp
-///
+//
+// basic_thrctx.hpp
+//
 
 #pragma once
 
@@ -20,7 +20,7 @@ namespace asev
 {
 namespace detail
 {
-/// Forward declares.
+// Forward declares.
 template <class>
 class basic_corctx;
 
@@ -86,7 +86,7 @@ public:
   }
 
 public:
-  /// Internal use.
+  //! Internal use.
   template <typename Event, typename PoolMake = cque::pool_make<Event>>
   cque::mpsc_pool<Event, PoolMake>& get_event_pool(PoolMake pmk = PoolMake{})
   {
@@ -138,6 +138,6 @@ private:
 
   affix_base* affix_;
 };
-} /// namespace detail
-} /// namespace asev
+} // namespace detail
+} // namespace asev
 

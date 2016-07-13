@@ -1,6 +1,6 @@
-///
-/// posix.hpp
-///
+//
+// posix.hpp
+//
 
 #pragma once
 
@@ -146,7 +146,7 @@ static std::list<stack_info> get_stack_list(
   return std::list<stack_info>();
 }
 
-/// Using backtrace to get stack list.
+// Using backtrace to get stack list.
 static std::list<stack_info> get_stack_list(size_t stack_depth)
 {
   ACTORX_ASSERTS(stack_depth <= 32);
@@ -190,7 +190,7 @@ struct context
   static size_t constexpr const size_ = 8 * 1024;
   unsigned char stack_[size_];
 
-  /// Local templ vars.
+  // Local templ vars.
   size_t stack_depth_;
   bool brief_;
   handler_t h_;
@@ -250,5 +250,5 @@ static void signal_filter(context& ctx)
     };
   sigaction(SIGSEGV, &sigact, nullptr);
 }
-} /// namespace detail
-} /// namespace csegv
+} // namespace detail
+} // namespace csegv

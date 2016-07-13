@@ -1,6 +1,6 @@
-///
-/// mpsc_count.hpp
-///
+//
+// mpsc_count.hpp
+//
 
 #pragma once
 
@@ -34,7 +34,7 @@ public:
   }
 
 public:
-  /// Reset count to zero, return count before reset.
+  //! Reset count to zero, return count before reset.
   /**
    * @return Count before reset
    */
@@ -43,13 +43,13 @@ public:
     return pri_reset();
   }
 
-  /// Increase count for one.
+  //! Increase count for one.
   void incr() noexcept
   {
     pri_incr();
   }
 
-  /// Increase count for one. if blocking invoke given functor.
+  //! Increase count for one. if blocking invoke given functor.
   /**
    * @param f A functor invoke on blocking.
    */
@@ -63,7 +63,7 @@ public:
     }
   }
 
-  /// Synchronized increase for one, if blocking, wake up it.
+  //! Synchronized increase for one, if blocking, wake up it.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waking up.
@@ -79,8 +79,8 @@ public:
       });
   }
 
-  /// Synchronized reset count to zero, return count before reset., if is already zero,
-  /// Block current thread until any incr coming.
+  //! Synchronized reset count to zero, return count before reset, 
+  //! if is already zero, Block current thread until any incr coming.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -92,8 +92,8 @@ public:
     return pri_synchronized_reset(mtx, cv);
   }
 
-  /// Synchronized reset count to zero, return count before reset., if is already zero,
-  /// block current thread for given time until incr coming or timed out.
+  //! Synchronized reset count to zero, return count before reset, if is already zero,
+  //! block current thread for given time until incr coming or timed out.
   /**
    * @param mtx Mutex for lock guard.
    * @param cv Condtion var for waiting.
@@ -219,7 +219,7 @@ private:
   }
 
 private:
-  /// Ensure occupy entire cache(s) line.
+  // Ensure occupy entire cache(s) line.
   char pad_[CQUE_CACHE_LINE_SIZE];
   CQUE_CACHE_ALIGNED_VAR(std::atomic_size_t, count_);
   CQUE_CACHE_ALIGNED_VAR(std::atomic_bool, blocked_);

@@ -1,6 +1,6 @@
-///
-/// queue.hpp
-///
+//
+// queue.hpp
+//
 
 #pragma once
 
@@ -14,7 +14,7 @@
 
 namespace cque
 {
-/// Single thread linked queue.
+//! Single thread linked queue.
 template <typename T>
 class queue
 {
@@ -55,7 +55,7 @@ public:
     return head_ == nullptr;
   }
 
-  /// Pop an element from head.
+  //! Pop an element from head.
   gsl::owner<T*> pop() noexcept
   {
     auto e = pri_pop();
@@ -67,7 +67,7 @@ public:
     return e;
   }
 
-  /// Push an element at tail.
+  //! Push an element at tail.
   void push(gsl::owner<T*> e) noexcept
   {
     if (e == nullptr)
@@ -80,7 +80,7 @@ public:
     pri_push(e);
   }
 
-  /// Pop an shared_ptr element from head.
+  //! Pop an shared_ptr element from head.
   /**
    * @note Only call in single-consumer thread.
    */
@@ -98,7 +98,7 @@ public:
     return std::shared_ptr<T>();
   }
 
-  /// Push an shared_ptr element at tail.
+  //! Push an shared_ptr element at tail.
   void push(std::shared_ptr<T> e) noexcept
   {
     if (!e)
@@ -113,7 +113,7 @@ public:
     pri_push(p);
   }
 
-  /// Pop an unique_ptr element from head.
+  //! Pop an unique_ptr element from head.
   /**
    * @note Only call in single-consumer thread.
    */
@@ -129,7 +129,7 @@ public:
     return std::move(std::unique_ptr<T, D>(e, d));
   }
 
-  /// Push an unique_ptr element at tail.
+  //! Push an unique_ptr element at tail.
   template <typename D>
   void push(std::unique_ptr<T, D>&& e) noexcept
   {
@@ -145,7 +145,7 @@ public:
     pri_push(p);
   }
 
-  /// Pop a variant_ptr element at head.
+  //! Pop a variant_ptr element at head.
   template <typename D = std::default_delete<T>>
   variant_ptr<T, D> pop_variant(D d = D()) noexcept
   {

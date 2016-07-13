@@ -1,6 +1,6 @@
-///
-/// freer_base.hpp
-///
+//
+// freer_base.hpp
+//
 
 #pragma once
 
@@ -12,7 +12,7 @@ namespace cque
 class node_base;
 struct freer_base
 {
-  /// return false if pool full, user must handle node by themself
+  //! return false if pool full, user must handle node by themself
   virtual bool free(gsl::owner<node_base*>) noexcept = 0;
 };
 }

@@ -1,6 +1,6 @@
-///
-/// Test spawn.
-///
+//
+// Test spawn.
+//
 
 #include <actorx/utest/all.hpp>
 

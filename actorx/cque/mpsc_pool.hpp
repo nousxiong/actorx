@@ -1,6 +1,6 @@
-///
-/// mpsc_pool.hpp
-///
+//
+// mpsc_pool.hpp
+//
 
 #pragma once
 
@@ -14,7 +14,7 @@
 
 namespace cque
 {
-/// Multi-producers one consumer node pool.
+//! Multi-producers one consumer node pool.
 template <typename T, typename PoolMake = pool_make<T>>
 class mpsc_pool
   : public pool_base
@@ -51,7 +51,7 @@ public:
   }
 
 public:
-  /// Warn: only call in single-consumer thread.
+  //! Warn: only call in single-consumer thread.
   gsl::owner<node_t*> get() noexcept override
   {
     auto n = pri_get();

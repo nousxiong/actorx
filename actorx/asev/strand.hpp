@@ -1,6 +1,6 @@
-///
-/// strand.hpp
-///
+//
+// strand.hpp
+//
 
 #pragma once
 

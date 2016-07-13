@@ -1,6 +1,6 @@
-///
-/// context.hpp
-///
+//
+// context.hpp
+//
 
 #pragma once
 
@@ -18,7 +18,7 @@
 
 namespace coctx
 {
-/// Coroutine's context.
+//! Coroutine's context.
 class context
 {
   using handler_t = std::function<void (context&)>;
@@ -84,7 +84,7 @@ public:
     return ssize_;
   }
 
-  /// Jump to given context.
+  //! Jump to given context.
   /**
    * @param to_ctx Context that will jump to.
    */
@@ -126,10 +126,10 @@ private:
   bool null_;
   gsl::owner<void*> fiber_;
 #else
-  /// must be at offset 0.
+  // must be at offset 0.
   detail::stack stk_;
   coctx_asmctx asmctx_;
 #endif
   handler_t hdr_;
 };
-} /// namespace coctx
+} // namespace coctx

@@ -1,6 +1,6 @@
-///
-/// csegv.hpp
-///
+//
+// csegv.hpp
+//
 
 #pragma once
 
@@ -33,7 +33,7 @@ private:
 };
 }
 
-/// Call a given function under protection.
+//! Call a given function under protection.
 template <typename F>
 static void pcall(F&& f, handler_t h = handler_t(), size_t stack_depth = 3, bool brief = true)
 {
@@ -60,7 +60,7 @@ static void pcall(F&& f, handler_t h = handler_t(), size_t stack_depth = 3, bool
 
   detail::pcall_impl(f);
 
-#elif defined(CSEGV_WINDOWS) /// mingw
+#elif defined(CSEGV_WINDOWS) // mingw
   f();
 #else
 
@@ -78,4 +78,4 @@ static void pcall(F&& f, handler_t h = handler_t(), size_t stack_depth = 3, bool
   f();
 #endif
 }
-} /// namespace csegv
+} // namespace csegv

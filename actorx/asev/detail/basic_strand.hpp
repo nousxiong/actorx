@@ -1,6 +1,6 @@
-///
-/// basic_strand.hpp
-///
+//
+// basic_strand.hpp
+//
 
 #pragma once
 
@@ -12,7 +12,7 @@ namespace asev
 {
 namespace detail
 {
-/// Seq queue for async events.
+//! Seq queue for async events.
 template <typename EvService>
 class basic_strand
 {
@@ -24,21 +24,21 @@ public:
   }
 
 public:
-  /// Post a functor to strand.
+  //! Post a functor to strand.
   template <typename F>
   void post(F&& f)
   {
     evs_.pri_post(index_, typename EvService::post_handler_t(f));
   }
 
-  /// Spawn an coroutine with strand.
+  //! Spawn an coroutine with strand.
   template <typename F>
   void spawn(F&& f, coctx::stack_size ssize = coctx::make_stacksize())
   {
     evs_.pri_spawn(index_, typename EvService::coro_handler_t(f), ssize);
   }
 
-  /// Add an user defined event into strand to run.
+  //! Add an user defined event into strand to run.
   /**
    * @param ev User defined event.
    */
@@ -47,7 +47,7 @@ public:
     evs_.pri_async(index_, ev);
   }
 
-  /// Get ev_serivce.
+  //! Get ev_serivce.
   inline EvService& get_ev_service() noexcept
   {
     return evs_;

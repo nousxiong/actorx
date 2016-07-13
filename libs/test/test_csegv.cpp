@@ -1,6 +1,6 @@
-///
-/// Test csegv.
-///
+//
+// Test csegv.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/asev/all.hpp>
@@ -68,7 +68,7 @@ UTEST_CASE_FINAL(10001, test_asev_csegv)
     auto ev = evs.make_event<my_event>();
     evs.async(ev);
   }
-  /// Start ev_service.
+  // Start ev_service.
   evs.run();
   std::cout << "done." << std::endl;
 }

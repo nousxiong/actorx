@@ -1,6 +1,6 @@
-///
-/// pool_base.hpp
-///
+//
+// pool_base.hpp
+//
 
 #pragma once
 
@@ -19,7 +19,7 @@ struct pool_base
 {
   virtual ~pool_base() noexcept {}
 
-  /// Try get a node from pool, if pool full, return nullptr.
+  //! Try get a node from pool, if pool full, return nullptr.
   virtual gsl::owner<node_base*> get() noexcept = 0;
 };
 
@@ -46,7 +46,7 @@ struct pool_delete
   }
 };
 
-/// Get an T object from pool.
+//! Get an T object from pool.
 template <typename T, typename Pool>
 static gsl::owner<T*> get(Pool& pool) noexcept
 {

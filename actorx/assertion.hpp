@@ -1,6 +1,6 @@
-///
-/// assertion.hpp
-///
+//
+// assertion.hpp
+//
 
 #pragma once
 
@@ -344,7 +344,7 @@ private:
   }
 
 public:
-  /// internal use
+  // internal use
   assertion& set_var(char v, gsl::czstring name)
   {
     return pri_set_var(v, name);
@@ -567,8 +567,8 @@ inline assertion make_assert(
 {
   return std::move(assertion(expr, file, line, lvl, aty));
 }
-} /// namespace detail
-} /// namespace actorx
+} // namespace detail
+} // namespace actorx
 
 #define ACTORX_ASSERT_A(x) ACTORX_ASSERT_OP(x, B)
 #define ACTORX_ASSERT_B(x) ACTORX_ASSERT_OP(x, A)

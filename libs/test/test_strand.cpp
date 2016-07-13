@@ -1,6 +1,6 @@
-///
-/// Test strand.
-///
+//
+// Test strand.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/asev/all.hpp>
@@ -65,7 +65,7 @@ UTEST_CASE(test_strand)
       );
   }
 
-  /// Start ev_service.
+  // Start ev_service.
   evs.run();
 
   for (auto& thr : thread_pool)

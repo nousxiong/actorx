@@ -1,6 +1,6 @@
-///
-/// Test assertion.
-///
+//
+// Test assertion.
+//
 
 #include <actorx/utest/all.hpp>
 #include <actorx/assertion.hpp>

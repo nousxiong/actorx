@@ -1,6 +1,6 @@
-///
-/// Test main.
-///
+//
+// Test main.
+//
 
 #include <actorx/utest/utest.hpp>
 

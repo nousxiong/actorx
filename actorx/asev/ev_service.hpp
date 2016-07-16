@@ -64,11 +64,22 @@ class ev_service
   ev_service& operator=(ev_service&&) = delete;
 
 public:
-  explicit ev_service(
-    size_t thread_num = std::thread::hardware_concurrency(),
-    logger_ptr logger = logger_ptr(),
-    size_t worker_num = 0
-    )
+  explicit ev_service()
+    : ev_service(std::thread::hardware_concurrency(), logger_ptr(), 0)
+  {
+  }
+
+  explicit ev_service(size_t thread_num)
+    : ev_service(thread_num, logger_ptr(), 0)
+  {
+  }
+
+  explicit ev_service(logger_ptr logger)
+    : ev_service(std::thread::hardware_concurrency(), logger, 0)
+  {
+  }
+
+  ev_service(size_t thread_num, logger_ptr logger, size_t worker_num)
     : uid_(0)
     , logger_(logger)
     , curr_sndidx_(0)
@@ -175,7 +186,7 @@ public:
     }
 
 #ifdef ACTORX_DEBUG
-    SPDLOG_DEBUG(logger_, "p: {}, m: {}, t: {}\n", pworks, mworks, tworks);
+    SPDLOG_DEBUG(logger_, "evs: {}, p: {}, m: {}, t: {}\n", uid_, pworks, mworks, tworks);
 #endif
   }
 
@@ -190,6 +201,12 @@ public:
   inline size_t get_worker_num() const noexcept
   {
     return worker_list_.size();
+  }
+
+  //! Get logger.
+  inline logger_ptr get_logger() const
+  {
+    return logger_;
   }
 
   //! Post a handler into background thread pool to run.
@@ -398,7 +415,7 @@ private:
     auto const thread_num = thread_data_list_.size();
     auto const worker_num = worker_list_.size();
 
-    // Get prior, minor and inferior workers.
+    // Get prior and minor workers.
     std::vector<size_t> priors;
     std::vector<size_t> minors;
     for (size_t n = 0; n<worker_num; ++n)
@@ -471,15 +488,23 @@ private:
     // Poll loop sleep duration.
     std::chrono::microseconds const poll_sleep_dur{ 50 };
 
+    // Must signed integer, bcz this may < 0.
+    long expected_pworks = 0;
     // Work loop.
     while (!thrdat.is_stop())
     {
       try
       {
+        if (expected_pworks > 0)
+        {
+          goto do_job;
+        }
+
         // First try aggressive polling.
         for (size_t i = 0; i<100; ++i)
         {
-          if (thrdat.cnt_.reset() > 0)
+          expected_pworks += thrdat.cnt_.reset();
+          if (expected_pworks > 0)
           {
             goto do_job;
           }
@@ -488,7 +513,8 @@ private:
         // Then moderate polling.
         for (size_t i = 0; i<500; ++i)
         {
-          if (thrdat.cnt_.reset() > 0 || thrdat.is_stop())
+          expected_pworks += thrdat.cnt_.reset();
+          if (expected_pworks > 0 || thrdat.is_stop())
           {
             goto do_job;
           }
@@ -496,7 +522,7 @@ private:
         }
 
         // Finally waiting notify.
-        thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
+        expected_pworks += thrdat.cnt_.synchronized_reset(thrdat.mtx_, thrdat.cv_);
 
       do_job:
         if (thrdat.is_stop())
@@ -509,12 +535,14 @@ private:
         ACTORX_ENSURES(false);
       }
 
-      // Firstly try run prior workers.
+      // First try run prior workers.
       size_t pworks = 0;
       for (auto n : priors)
       {
         // Try pop a worker to run.
         pworks += do_work(n, thrctx, work_level::prior);
+        expected_pworks -= pworks;
+        expected_pworks -= worker_list_[n].fetch_sworks();
       }
 
       // @todo works dynamic load balance.
@@ -540,14 +568,17 @@ private:
       // Set current worker.
       thrctx.set_worker(wkr);
       auto _ = gsl::finally(
-        [this, wkridx, wkr, &thrctx]()
+        [this, wkridx, wkr, &thrctx, wlv]()
         {
           thrctx.set_worker(nullptr);
           workshop_[wkridx].store(wkr, std::memory_order_release);
-          // @note This must call, bcz before set wkr, there may be new event add into
-          //   this worker, but this worker's thread may exchange nullptr, so events may
-          //   be omited.
-          notify_thread(wkridx);
+          //// @note This must call, bcz before set wkr, there may be new event add into
+          ////   this worker, but this worker's thread may exchange nullptr, so events may
+          ////   be omited.
+          //if (wlv == work_level::minor)
+          //{
+          //  notify_thread(wkridx);
+          //}
         });
       works += wkr->work(thrctx, wlv);
     }

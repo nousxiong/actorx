@@ -13,3 +13,9 @@
 #   define ACTORX_ENABLE_ASSERT
 # endif
 #endif
+
+#ifndef SPDLOG_DEBUG_ON
+# ifdef ACTORX_DEBUG
+#   define SPDLOG_DEBUG_ON
+# endif
+#endif

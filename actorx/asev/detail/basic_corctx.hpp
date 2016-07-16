@@ -31,7 +31,6 @@ public:
     , thrctx_(nullptr)
     , host_ctx_(nullptr)
     , stop_(false)
-    , affix_(nullptr)
   {
   }
 
@@ -71,17 +70,29 @@ public:
   }
 
   template <typename T>
-  void set_affix(T* affix)
+  T* add_affix(T* affix) noexcept
   {
     static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
-    affix_ = affix;
+    return affix_list_.add(affix);
   }
 
   template <typename T>
-  T* get_affix()
+  T* get_affix() noexcept
   {
     static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
-    return gsl::narrow<T*>(affix_);
+    return affix_list_.get<T>();
+  }
+
+  template <typename T>
+  T* rmv_affix() noexcept
+  {
+    static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
+    return affix_list_.rmv<T>();
+  }
+
+  std::vector<affix_base*> clear_affix() noexcept
+  {
+    return affix_list_.clear();
   }
 
 public:
@@ -146,9 +157,9 @@ public:
     host_ctx_ = nullptr;
     hdr_ = coro_handler_t();
     thrctx_ = nullptr;
-    affix_ = nullptr;
+    affix_list_.clear();
     // No need reset, bcz ctx will reuse.
-//    ctx_.reset();
+    // ctx_.reset();
   }
 
 private:
@@ -161,7 +172,7 @@ private:
   std::unique_ptr<coctx::context> ctx_;
   bool stop_;
 
-  affix_base* affix_;
+  affix_list affix_list_;
 };
 
 template <typename EvService>

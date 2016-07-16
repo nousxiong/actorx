@@ -36,6 +36,7 @@ class worker
 public:
   worker(size_t worker_num, size_t index) noexcept
     : index_(index)
+    , sworks_(0)
     , pworks_(0)
     , mworks_(0)
   {
@@ -57,6 +58,11 @@ public:
   size_t get_index() const noexcept
   {
     return index_;
+  }
+
+  size_t fetch_sworks() noexcept
+  {
+    return sworks_.exchange(0, std::memory_order_acquire);
   }
 
   void push_event(gsl::owner<event_base*> ev) noexcept
@@ -99,8 +105,16 @@ public:
     switch (wlv)
     {
     case work_level::prior: pworks_ += works; break;
-    case work_level::minor: mworks_ += works; break;
+    case work_level::minor:
+    {
+      mworks_ += works;
+      if (works > 0)
+      {
+        sworks_.fetch_add(works, std::memory_order_release);
+      }
+    }break;
     }
+
     return works;
   }
 
@@ -117,6 +131,8 @@ public:
 private:
   size_t index_;
   cque::mpsc_queue<event_base, eclipse_clock_t> que_;
+  // stolen works
+  std::atomic_size_t sworks_;
 
   //! Status.
   int64_t pworks_;

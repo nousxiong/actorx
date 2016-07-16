@@ -85,7 +85,7 @@ public:
 
       auto case_list = case_list_;
       case_list_.clear();
-      for (auto& c : case_list_)
+      for (auto& c : case_list)
       {
         if (enabled_list_.find(c.name_) != enabled_list_.end())
         {

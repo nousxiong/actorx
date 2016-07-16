@@ -21,6 +21,11 @@ elseif (WIN32)
 endif ()
 
 if (ACTORX_DEV)
+  # Create vc filter
+  if (MSVC)
+    actorx_source_group(actorx)
+  endif ()
+
   # Set up all files.
   file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/actorx/*.hpp")
   file (GLOB_RECURSE ACTORX_SOURCE_FILES "${PROJECT_SOURCE_DIR}/libs/src/src.cpp")

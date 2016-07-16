@@ -10,6 +10,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include <set>
 #include <list>
 #include <memory>
 #include <typeinfo>
@@ -51,7 +52,6 @@ public:
     , logger_(logger)
     , curr_worker_(nullptr)
     , curr_corctx_(nullptr)
-    , affix_(nullptr)
   {
   }
 
@@ -72,17 +72,29 @@ public:
   }
 
   template <typename T>
-  void set_affix(T* affix) noexcept
+  T* add_affix(T* affix) noexcept
   {
     static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
-    affix_ = affix;
+    return affix_list_.add(affix);
   }
 
   template <typename T>
-  T* get_affix()
+  T* get_affix() noexcept
   {
     static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
-    return gsl::narrow<T*>(affix_);
+    return affix_list_.get<T>();
+  }
+
+  template <typename T>
+  T* rmv_affix() noexcept
+  {
+    static_assert(std::is_base_of<affix_base, T>::value, "T must inhert from asev::affix_base");
+    return affix_list_.rmv<T>();
+  }
+
+  std::vector<affix_base*> clear_affix() noexcept
+  {
+    return affix_list_.clear();
   }
 
 public:
@@ -136,7 +148,7 @@ private:
   std::list<event_pool> pool_list_;
   corctx_t* curr_corctx_;
 
-  affix_base* affix_;
+  affix_list affix_list_;
 };
 } // namespace detail
 } // namespace asev

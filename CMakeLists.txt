@@ -15,6 +15,9 @@ project (actorx)
 # Set -std=c++11.
 set (CMAKE_CXX_STANDARD 11)
 
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libs/cmake")
+include (util)
+
 # Provide user options to customise the build process.
 option (ACTORX_DEV "Actorx dev mode" OFF)
 option (ACTORX_BUILD_EXAMPLE "Build Actorx examples" OFF)
@@ -32,7 +35,7 @@ option (ACTORX_INSTALL_DEPENDENCIES "Install all dependencies" ON)
 set (ASIO_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/dependencies/asio" CACHE STRING "Include directory for asio")
 set (GSL_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/dependencies/gsl" CACHE STRING "Include directory for gsl")
 set (SPDLOG_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/dependencies/spdlog" CACHE STRING "Include directory for spdlog")
-if (ACTORX_HOOK AND MSVC)
+if (ACTORX_HOOK)
   set (XHOOK_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/dependencies/xhook" CACHE STRING "Include directory for xhook")
 endif ()
 
@@ -60,6 +63,9 @@ include_directories (${PROJECT_BINARY_DIR})
 include_directories (${ASIO_INCLUDE_DIR})
 include_directories (${GSL_INCLUDE_DIR})
 include_directories (${SPDLOG_INCLUDE_DIR})
+if (ACTORX_HOOK)
+  include_directories (${XHOOK_INCLUDE_DIR})
+endif ()
 
 # Find threads
 find_package (Threads)

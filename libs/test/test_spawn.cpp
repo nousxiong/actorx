@@ -57,7 +57,7 @@ UTEST_CASE(test_spawn)
 
   asev::ev_service evs;
   asev::strand_t snd(evs);
-  size_t const total = 200;
+  size_t const total = 100;
   std::atomic_size_t count(total);
 
   for (size_t i = 0; i < total; ++i)
@@ -67,15 +67,15 @@ UTEST_CASE(test_spawn)
       {
         usr::timer tmr(ios, self);
 
-        for (size_t i=0; i<5; ++i)
+        for (size_t i=0; i<2; ++i)
         {
           auto bt = std::chrono::system_clock::now();
-          tmr.sleep_for(std::chrono::milliseconds(100));
+          tmr.sleep_for(std::chrono::milliseconds(300));
           auto eclipse =
             std::chrono::duration_cast<std::chrono::milliseconds>(
               std::chrono::system_clock::now() - bt
               );
-          ACTORX_ENSURES(eclipse >= std::chrono::milliseconds(100))(eclipse);
+          ACTORX_ENSURES(eclipse >= std::chrono::milliseconds(300))(eclipse);
         }
 
         if (--count == 0)

@@ -12,6 +12,6 @@
 #include "actorx/asev/ev_service.hpp"
 #include "actorx/asev/strand.hpp"
 
-#if defined(ACTORX_SPDLOG_DEBUG_ON) && defined(SPDLOG_DEBUG_ON)
+#if defined(ACTX_SPDLOG_DEBUG_ON) && defined(SPDLOG_DEBUG_ON)
 # undef SPDLOG_DEBUG_ON
-#endif // ACTORX_SPDLOG_DEBUG_ON
+#endif // ACTX_SPDLOG_DEBUG_ON

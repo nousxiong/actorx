@@ -79,7 +79,7 @@ public:
       });
   }
 
-  //! Synchronized reset count to zero, return count before reset, 
+  //! Synchronized reset count to zero, return count before reset,
   //! if is already zero, Block current thread until any incr coming.
   /**
    * @param mtx Mutex for lock guard.
@@ -103,7 +103,7 @@ public:
   template <class Mutex, class CondVar, typename TimeDuration>
   std::pair<size_t, duration_t> synchronized_reset(Mutex& mtx, CondVar& cv, TimeDuration const& timeout)
   {
-    ACTORX_ASSERTS(!blocked());
+    ACTX_ASSERTS(!blocked());
     if (timeout <= TimeDuration::zero())
     {
       auto c = reset();
@@ -198,7 +198,7 @@ private:
   template <class Mutex, class CondVar>
   size_t pri_synchronized_reset(Mutex& mtx, CondVar& cv)
   {
-    ACTORX_ASSERTS(!blocked());
+    ACTX_ASSERTS(!blocked());
     auto c = reset();
     if (c != 0)
     {

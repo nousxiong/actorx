@@ -32,10 +32,10 @@ inline stack_size make_stacksize(size_t size = 0)
   stack_size ssize;
 #if defined(COCTX_WINDOWS)
   //! On windows using fiber, and fiber stack size must be multiples of 64k(SYSTEM_INFO.dwAllocationGranularity)
-  size_t constexpr alloc_granularity = 64 * 1024;
+  size_t constexpr alloc_granularity = 64 * 1024 * 16;
   ssize.size_ = (size / alloc_granularity + 1) * alloc_granularity;
 #else
-  size_t constexpr min_size = 64 * 1024;
+  size_t constexpr min_size = 64 * 1024 * 16;
   ssize.size_ = (std::max)(min_size, size);
 #endif // defined
   return ssize;

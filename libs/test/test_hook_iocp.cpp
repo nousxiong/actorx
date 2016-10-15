@@ -325,7 +325,7 @@ static HANDLE WINAPI CreateIoCompletionPortH(
   }
 
   auto thraf = thrctx->get_affix<thr_affix>();
-  ACTORX_ASSERTS(thraf != nullptr);
+  ACTX_ASSERTS(thraf != nullptr);
 
   if (!thraf->is_socket_ && ExistingCompletionPort == NULL)
   {
@@ -333,16 +333,16 @@ static HANDLE WINAPI CreateIoCompletionPortH(
     auto pr = thraf->iocp_svcs_.emplace(
       rt, iocp_service(thrctx->get_ev_service().get_logger(), rt, NumberOfConcurrentThreads)
       );
-    ACTORX_ASSERTS(pr.second);
+    ACTX_ASSERTS(pr.second);
 
     // Start this new iocp_service.
     pr.first->second.start();
-    
+
     /*auto corctx = thrctx->get_corctx();
-    ACTORX_ASSERTS(corctx != nullptr);
+    ACTX_ASSERTS(corctx != nullptr);
 
     auto coraf = corctx->get_affix<cor_affix>();
-    ACTORX_ASSERTS(coraf != nullptr);
+    ACTX_ASSERTS(coraf != nullptr);
 
     if (coraf->iocp_ != NULL)
     {
@@ -393,10 +393,10 @@ static SOCKET WSAAPI accept_h(SOCKET s, struct sockaddr* addr, int* addrlen)
   }
 
   auto corctx = thrctx->get_corctx();
-  ACTORX_EXPECTS(corctx != nullptr);
+  ACTX_EXPECTS(corctx != nullptr);
 
   auto coraf = corctx->get_affix<cor_affix>();
-  ACTORX_EXPECTS(coraf != nullptr);
+  ACTX_EXPECTS(coraf != nullptr);
 
   io_context& ioctx = coraf->ioctx_;
   DWORD bytes = 0;
@@ -452,7 +452,7 @@ static SOCKET WSAAPI WSASocketWH(
   }
 
   auto thraf = thrctx->get_affix<thr_affix>();
-  ACTORX_ASSERTS(thraf != nullptr);
+  ACTX_ASSERTS(thraf != nullptr);
 
   thraf->is_socket_ = true;
   auto s = WSASocketWF(af, type, protocol, lpProtocolInfo, g, dwFlags);
@@ -478,8 +478,8 @@ static int WSAAPI WSARecvH(
 UTEST_CASE(test_hook_iocp)
 {
   //asio::io_service ios;
-  asev::ev_service evs(1);
-  //asev::ev_service evs;
+  //asev::ev_service evs(1);
+  asev::ev_service evs;
   evs.tstart(
     [](asev::thrctx_t& thrctx)
     {
@@ -523,25 +523,21 @@ UTEST_CASE(test_hook_iocp)
   evs.spawn(
     [&](asev::corctx_t& self)
     {
+      using socket_ptr = std::shared_ptr<asio::ip::tcp::socket>;
       logger->info("Begin corctx accept!");
       asio::io_service acpr_ios;
-      //auto iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
+      asio::io_service skt_ios;
       usr::cor_affix coraf(self);
-
-      //auto s = ::socket(AF_INET, SOCK_STREAM, 0);
 
       asio::ip::tcp::endpoint ep(asio::ip::tcp::v4(), 23333);
       asio::ip::tcp::acceptor acpr(acpr_ios, ep);
 
-      //asio::io_service skt_ios;
-      asio::ip::tcp::socket skt(acpr_ios);
-      auto bt = std::chrono::system_clock::now();
-      acpr.accept(skt);
-      auto eclipse =
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::system_clock::now() - bt
-          );
-      logger->info("End corctx accept, eclipse: {}", eclipse.count());
+      for (int i = 0; i < 3; ++i)
+      {
+        auto skt = std::make_shared<asio::ip::tcp::socket>(std::ref(skt_ios));
+        acpr.accept(*skt);
+        logger->info("Accept socket: {}", skt->native_handle());
+      }
 
       if (--count == 0)
       {

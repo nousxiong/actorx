@@ -44,22 +44,22 @@ public:
     return evs_;
   }
 
-  inline strand_t& get_strand()
+  inline strand_t get_strand() const noexcept
   {
     return snd_;
   }
 
   thrctx_t& get_thrctx()
   {
-    ACTORX_ASSERTS(thrctx_ != nullptr);
+    ACTX_ASSERTS(thrctx_ != nullptr);
     return *thrctx_;
   }
 
   void yield()
   {
-    ACTORX_ASSERTS(host_ctx_ != nullptr);
-    ACTORX_ASSERTS(!!ctx_);
-    ACTORX_ASSERTS(thrctx_ != nullptr);
+    ACTX_ASSERTS(host_ctx_ != nullptr);
+    ACTX_ASSERTS(!!ctx_);
+    ACTX_ASSERTS(thrctx_ != nullptr);
     thrctx_->set_corctx(nullptr);
     ctx_->jump(*host_ctx_);
   }
@@ -131,8 +131,8 @@ public:
     thrctx_ = &thrctx;
     if (!stop_)
     {
-      ACTORX_ASSERTS(!!hdr_);
-      ACTORX_ASSERTS(!!ctx_);
+      ACTX_ASSERTS(!!hdr_);
+      ACTX_ASSERTS(!!ctx_);
       host_ctx_ = &evs_.get_hostctx(thrctx.get_index());
       thrctx.set_corctx(this);
       host_ctx_->jump(*ctx_);

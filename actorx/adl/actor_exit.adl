@@ -1,0 +1,11 @@
+//
+// actor_exit.adl
+//
+
+namespace = actorx.adl;
+
+actor_exit
+{
+  int8 type;
+  string errmsg;
+}

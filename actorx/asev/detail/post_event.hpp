@@ -30,7 +30,7 @@ public:
   //! Inherit from asev::event_base.
   bool handle(thrctx_t& thrctx) override
   {
-    ACTORX_ASSERTS(!!hdr_);
+    ACTX_ASSERTS(!!hdr_);
     hdr_(thrctx);
     return true;
   }

@@ -38,6 +38,7 @@ UTEST_CASE(test_strand)
   };
 
   asev::ev_service evs;
+  //asev::ev_service evs(asev::work_steal(false));
   auto const concurr = std::thread::hardware_concurrency() * 1;
   decltype(concurr) count = 100000;
   std::vector<std::thread> thread_pool;

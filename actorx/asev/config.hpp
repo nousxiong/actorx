@@ -19,9 +19,9 @@
 # define ASEV_MAX_AFFIX_LIST_DIVISION 16
 #endif // ASEV_MAX_AFFIX_LIST_DIVISION
 
-#ifdef ACTORX_DEBUG
+#ifdef ACTX_DEBUG
 # ifndef SPDLOG_DEBUG_ON
-#   define ACTORX_SPDLOG_DEBUG_ON
+#   define ACTX_SPDLOG_DEBUG_ON
 #   define SPDLOG_DEBUG_ON
 # endif
-#endif // ACTORX_DEBUG
+#endif // ACTX_DEBUG

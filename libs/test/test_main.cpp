@@ -5,6 +5,13 @@
 #include <actorx/utest/utest.hpp>
 
 
+//UTEST_ENABLE(test_mailbox)
+//UTEST_ENABLE(test_message)
+//UTEST_ENABLE(test_pattern)
+//UTEST_ENABLE(test_buffer_pool)
+//UTEST_ENABLE(test_cow_buffer)
+//UTEST_ENABLE(test_actor)
+//UTEST_ENABLE(test_atom)
 //UTEST_ENABLE(test_strand)
 //UTEST_ENABLE(test_pingpong)
 //UTEST_ENABLE(test_spawn)

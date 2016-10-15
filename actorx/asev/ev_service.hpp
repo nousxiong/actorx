@@ -34,6 +34,22 @@
 
 namespace asev
 {
+//! ev_service's attr, if or not work steal.
+struct work_steal
+{
+  explicit work_steal(bool flag)
+    : flag_(flag)
+  {
+  }
+
+  operator bool() const
+  {
+    return flag_;
+  }
+
+  bool const flag_;
+};
+
 //! Provides async event functionality.
 class ev_service
 {
@@ -65,32 +81,38 @@ class ev_service
 
 public:
   explicit ev_service()
-    : ev_service(std::thread::hardware_concurrency(), logger_ptr(), 0)
+    : ev_service(std::thread::hardware_concurrency(), logger_ptr(), 0, true)
   {
   }
 
   explicit ev_service(size_t thread_num)
-    : ev_service(thread_num, logger_ptr(), 0)
+    : ev_service(thread_num, logger_ptr(), 0, true)
   {
   }
 
   explicit ev_service(logger_ptr logger)
-    : ev_service(std::thread::hardware_concurrency(), logger, 0)
+    : ev_service(std::thread::hardware_concurrency(), logger, 0, true)
   {
   }
 
-  ev_service(size_t thread_num, logger_ptr logger, size_t worker_num)
+  explicit ev_service(work_steal ws)
+    : ev_service(std::thread::hardware_concurrency(), logger_ptr(), 0, ws)
+  {
+  }
+
+  ev_service(size_t thread_num, logger_ptr logger, size_t worker_num, bool work_steal)
     : uid_(0)
     , logger_(logger)
     , curr_sndidx_(0)
     , stopped_workers_(0)
+    , work_steal_(work_steal)
   {
     static std::atomic_uint evs_uid(0);
     uid_ = evs_uid++;
 
     if (!logger_)
     {
-#ifdef ACTORX_DEBUG
+#ifdef ACTX_DEBUG
       auto logger = spdlog::get("stdout");
       if (!logger)
       {
@@ -107,7 +129,7 @@ public:
         logger = std::make_shared<spdlog::logger>("null_logger", null_sink);
       }
       logger_ = logger;
-#endif // ACTORX_DEBUG
+#endif // ACTX_DEBUG
     }
 
     thread_num = thread_num == 0 ? 1 : thread_num;
@@ -161,7 +183,7 @@ public:
       }
     }
 
-#ifdef ACTORX_DEBUG
+#ifdef ACTX_DEBUG
     int64_t tworks = 0;
     int64_t pworks = 0;
     int64_t mworks = 0;
@@ -185,7 +207,7 @@ public:
       }
     }
 
-#ifdef ACTORX_DEBUG
+#ifdef ACTX_DEBUG
     SPDLOG_DEBUG(logger_, "evs: {}, p: {}, m: {}, t: {}\n", uid_, pworks, mworks, tworks);
 #endif
   }
@@ -204,9 +226,15 @@ public:
   }
 
   //! Get logger.
-  inline logger_ptr get_logger() const
+  inline logger_ptr get_logger() const noexcept
   {
     return logger_;
+  }
+
+  //! Get unique id.
+  inline uid_t get_uid() const noexcept
+  {
+    return uid_;
   }
 
   //! Post a handler into background thread pool to run.
@@ -285,7 +313,7 @@ public:
         }
       }
 
-      ACTORX_EXPECTS(uid_ < ASEV_MAX_EV_SERVICE);
+      ACTX_EXPECTS(uid_ < ASEV_MAX_EV_SERVICE);
 
       auto& curr_pool = pool_array.arr_[uid_];
       if (curr_pool == nullptr)
@@ -303,7 +331,7 @@ public:
       pool = &thrctx->get_event_pool<Event, PoolMake>(pmk);
     }
 
-    ACTORX_ASSERTS(pool != nullptr);
+    ACTX_ASSERTS(pool != nullptr);
     return cque::get<Event>(*pool);
   }
 
@@ -348,7 +376,7 @@ public:
                   }
                   catch (...)
                   {
-                    ACTORX_ENSURES(false);
+                    ACTX_ENSURES(false);
                   }
 
                   if (is_auto)
@@ -425,7 +453,7 @@ private:
       {
         priors.push_back(n);
       }
-      else
+      else if (work_steal_)
       {
         minors.push_back(n);
       }
@@ -447,7 +475,7 @@ private:
       }
       catch (...)
       {
-        ACTORX_ENSURES(false);
+        ACTX_ENSURES(false);
       }
 
       if (is_auto)
@@ -475,7 +503,7 @@ private:
         }
         catch (...)
         {
-          ACTORX_ENSURES(false);
+          ACTX_ENSURES(false);
         }
 
         if (is_auto)
@@ -532,7 +560,7 @@ private:
       }
       catch (...)
       {
-        ACTORX_ENSURES(false);
+        ACTX_ENSURES(false);
       }
 
       // First try run prior workers.
@@ -673,7 +701,7 @@ private:
 
   coctx::context& get_hostctx(size_t index)
   {
-    ACTORX_ASSERTS(index < thread_data_list_.size());
+    ACTX_ASSERTS(index < thread_data_list_.size());
     return thread_data_list_[index].host_ctx_;
   }
 
@@ -731,5 +759,7 @@ private:
 
   std::atomic_size_t curr_sndidx_;
   std::atomic_size_t stopped_workers_;
+
+  bool const work_steal_;
 };
 }

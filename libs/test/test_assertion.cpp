@@ -15,7 +15,7 @@ struct usr_data
   std::string str_;
 };
 
-namespace actorx
+namespace actx
 {
 template <>
 struct format<usr_data>
@@ -40,7 +40,7 @@ UTEST_CASE_SEQ(10, test_assertion)
     usr_data udat;
     udat.i_ = 42;
     udat.str_ = "the answer is 42";
-    ACTORX_ENSURES(udat.i_ == 41)(udat).except();
+    ACTX_ENSURES(udat.i_ == 41)(udat).except();
     Ensures(false);
   }
   catch (std::exception& ex)
@@ -54,8 +54,8 @@ UTEST_CASE_SEQ(10, test_assertion)
   {
     int i = 0;
     std::string str("std::cerr");
-    ACTORX_ASSERTS(i == 0 && str == "hi")(i)(str).log().except();
-#ifdef ACTORX_ENABLE_ASSERT
+    ACTX_ASSERTS(i == 0 && str == "hi")(i)(str).log().except();
+#ifdef ACTX_ENABLE_ASSERT
     Ensures(false);
 #endif
   }
@@ -70,7 +70,7 @@ UTEST_CASE_SEQ(10, test_assertion)
   {
     int i = 0;
     std::string str("ensures");
-    ACTORX_EXPECTS(i == 0 && str == "hi")(i)(str).except<std::runtime_error>();
+    ACTX_EXPECTS(i == 0 && str == "hi")(i)(str).except<std::runtime_error>();
     Ensures(false);
   }
   catch (std::runtime_error& ex)
@@ -82,7 +82,7 @@ UTEST_CASE_SEQ(10, test_assertion)
 
   try
   {
-    ACTORX_ENSURES(false).msg("std::runtime_error").except<std::runtime_error>();
+    ACTX_ENSURES(false).msg("std::runtime_error").except<std::runtime_error>();
     Ensures(false);
   }
   catch (std::runtime_error& ex)
@@ -101,8 +101,8 @@ UTEST_CASE_SEQ(10, test_assertion)
   {
     int i = 0;
     std::string str("std_logger");
-    ACTORX_ASSERTS(i == 0 && str == "hi")(i)(str).log(lg).except();
-#ifdef ACTORX_ENABLE_ASSERT
+    ACTX_ASSERTS(i == 0 && str == "hi")(i)(str).log(lg).except();
+#ifdef ACTX_ENABLE_ASSERT
     Ensures(false);
 #endif
   }

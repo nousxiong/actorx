@@ -51,7 +51,6 @@ struct affix_list
       size_t i = 0;
       for (auto& affix_ptr : vec_)
       {
-        auto& affix_ptr = vec_[i];
         if (affix_ptr != nullptr)
         {
           if (affix_ptr->tyidx_ == tyidx)
@@ -74,7 +73,7 @@ struct affix_list
         }
       }
 
-      ACTORX_ASSERTS(first_empty_ptr != nullptr);
+      ACTX_ASSERTS(first_empty_ptr != nullptr);
       *first_empty_ptr = affix;
       ++vec_size_;
       return nullptr;
@@ -134,7 +133,7 @@ struct affix_list
       auto& affix_ptr = vec_[i];
       if (affix_ptr != nullptr)
       {
-        if (affix_ptr->tyidx_ == typidx)
+        if (affix_ptr->tyidx_ == tyidx)
         {
           auto old = affix_ptr;
           affix_ptr = nullptr;

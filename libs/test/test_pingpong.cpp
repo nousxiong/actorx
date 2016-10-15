@@ -130,6 +130,7 @@ UTEST_CASE(test_pingpong)
   auto const total = concurr * count;
 
   asev::ev_service evs(concurr);
+  //asev::ev_service evs(asev::work_steal(false));
   std::vector<asev::strand_t> snds;
   for (size_t i = 0; i < concurr; ++i)
   {
@@ -142,7 +143,7 @@ UTEST_CASE(test_pingpong)
     [&snds, total, &ec, &utcnt](asev::thrctx_t& thrctx)
     {
       auto& evs = thrctx.get_ev_service();
-      size_t batch = 1000;
+      size_t batch = 10000;
       auto turn = total / batch;
       auto& snd = snds.front();
       pingpong_event::make ppev_make(snds);

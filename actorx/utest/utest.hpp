@@ -20,6 +20,7 @@ namespace utest
 {
 struct ucase
 {
+  int priority_;
   std::string name_;
   std::function<void ()> f_;
 };
@@ -45,6 +46,7 @@ public:
   void add_case(std::string name, F f)
   {
     ucase uc;
+    uc.priority_ = -1;
     uc.name_ = std::move(name);
     uc.f_ = std::move(f);
     case_list_.push_back(std::move(uc));
@@ -142,7 +144,14 @@ private:
 
     try
     {
-      std::cout << "--------------<" << c.name_ << "> begin--------------" << std::endl;
+      if (c.priority_ >= 0)
+      {
+        std::cout << "--------------<" << c.name_ << ">(" << c.priority_ << ") begin--------------" << std::endl;
+      }
+      else
+      {
+        std::cout << "--------------<" << c.name_ << "> begin--------------" << std::endl;
+      }
       c.f_();
       std::cout << "--------------<" << c.name_ << "> end----------------" << std::endl;
     }
@@ -162,6 +171,7 @@ private:
     )
   {
     ucase uc;
+    uc.priority_ = priority;
     uc.name_ = name;
     uc.f_ = std::move(f);
     auto pr = case_list.emplace(priority, std::move(uc));

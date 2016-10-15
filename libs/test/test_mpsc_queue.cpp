@@ -69,9 +69,9 @@ UTEST_CASE_SEQ(220, test_mpsc_queue)
     auto e = que.pop_unique<cque::pool_delete<data>>();
     if (e)
     {
-      ACTORX_ENSURES(e->t_ >= 0 && e->t_ < concurr)(e->t_);
-      ACTORX_ENSURES(counter[e->t_] == e->i_)(counter[e->t_])(e->i_);
-      ACTORX_ENSURES(e->str_ == "test string")(e->str_);
+      ACTX_ENSURES(e->t_ >= 0 && e->t_ < concurr)(e->t_);
+      ACTX_ENSURES(counter[e->t_] == e->i_)(counter[e->t_])(e->i_);
+      ACTX_ENSURES(e->str_ == "test string")(e->str_);
       ++counter[e->t_];
       ++i;
     }
@@ -164,9 +164,9 @@ UTEST_CASE_SEQ(221, test_mpsc_queue_variant)
     auto e = que.pop_variant<cque::pool_delete<data>>();
     if (e)
     {
-      ACTORX_ENSURES(e->t_ >= 0 && e->t_ < concurr)(e->t_);
-      ACTORX_ENSURES(counter[e->t_] == e->i_)(counter[e->t_])(e->i_);
-      ACTORX_ENSURES(e->str_ == "test string")(e->str_);
+      ACTX_ENSURES(e->t_ >= 0 && e->t_ < concurr)(e->t_);
+      ACTX_ENSURES(counter[e->t_] == e->i_)(counter[e->t_])(e->i_);
+      ACTX_ENSURES(e->str_ == "test string")(e->str_);
       ++counter[e->t_];
       ++i;
     }

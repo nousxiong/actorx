@@ -18,14 +18,14 @@
 #include <cassert>
 
 
-namespace actorx
+namespace actx
 {
 template <typename T>
 struct format
 {
 };
 
-enum assert_type
+enum class assert_type
 {
   asserts,
   expects,
@@ -140,8 +140,8 @@ public:
     gsl::czstring expr, gsl::czstring file, int line,
     spdlog::level::level_enum lvl, assert_type aty = assert_type::asserts
     )
-    : ACTORX_ASSERT_A(*this)
-    , ACTORX_ASSERT_B(*this)
+    : ACTX_ASSERT_A(*this)
+    , ACTX_ASSERT_B(*this)
     , lvl_(lvl)
     , ex_((time_point_t::min)())
     , msg_(nullptr)
@@ -182,8 +182,8 @@ public:
   }
 
   assertion(assertion&& other)
-    : ACTORX_ASSERT_A(*this)
-    , ACTORX_ASSERT_B(*this)
+    : ACTX_ASSERT_A(*this)
+    , ACTX_ASSERT_B(*this)
     , str_(std::move(other.str_))
     , lg_(std::move(other.lg_))
     , lvl_(other.lvl_)
@@ -213,7 +213,7 @@ public:
 
     if (ex_ != (time_point_t::min)())
     {
-      actorx::assert_except::make_description(str_, "Exception timestamp <", ex_, msg_);
+      actx::assert_except::make_description(str_, "Exception timestamp <", ex_, msg_);
     }
 
     bool throw_except = false;
@@ -268,12 +268,12 @@ public:
       {
         log_str = nullptr;
       }
-      throw actorx::assert_except(ex_, msg_, log_str, aty_);
+      throw actx::assert_except(ex_, msg_, log_str, aty_);
     }
   }
 
-  assertion& ACTORX_ASSERT_A;
-  assertion& ACTORX_ASSERT_B;
+  assertion& ACTX_ASSERT_A;
+  assertion& ACTX_ASSERT_B;
 
 public:
   assertion& msg(gsl::czstring msg)
@@ -307,13 +307,13 @@ public:
   void except()
   {
     auto log_str = pri_except();
-    throw actorx::assert_except(ex_, msg_, log_str, aty_);
+    throw actx::assert_except(ex_, msg_, log_str, aty_);
   }
 
   void except(std::error_code const& ec)
   {
     auto log_str = pri_except();
-    actorx::assert_except ex(ex_, msg_, log_str, aty_);
+    actx::assert_except ex(ex_, msg_, log_str, aty_);
     throw std::system_error(ec, ex.what());
   }
 
@@ -321,7 +321,7 @@ public:
   void except()
   {
     auto log_str = pri_except();
-    actorx::assert_except ex(ex_, msg_, log_str, aty_);
+    actx::assert_except ex(ex_, msg_, log_str, aty_);
     throw Except(ex.what());
   }
 
@@ -568,30 +568,30 @@ inline assertion make_assert(
   return std::move(assertion(expr, file, line, lvl, aty));
 }
 } // namespace detail
-} // namespace actorx
+} // namespace actx
 
-#define ACTORX_ASSERT_A(x) ACTORX_ASSERT_OP(x, B)
-#define ACTORX_ASSERT_B(x) ACTORX_ASSERT_OP(x, A)
+#define ACTX_ASSERT_A(x) ACTX_ASSERT_OP(x, B)
+#define ACTX_ASSERT_B(x) ACTX_ASSERT_OP(x, A)
 
-#define ACTORX_ASSERT_OP(x, next) \
-  ACTORX_ASSERT_A.set_var((x), #x).ACTORX_ASSERT_##next
+#define ACTX_ASSERT_OP(x, next) \
+  ACTX_ASSERT_A.set_var((x), #x).ACTX_ASSERT_##next
 
-#ifdef ACTORX_ENABLE_ASSERT
-# define ACTORX_ASSERTS(expr) \
+#ifdef ACTX_ENABLE_ASSERT
+# define ACTX_ASSERTS(expr) \
   if ( (expr) ) ; \
-  else actorx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::debug).ACTORX_ASSERT_A
+  else actx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::debug).ACTX_ASSERT_A
 
 #else
-# define ACTORX_ASSERTS(expr) \
+# define ACTX_ASSERTS(expr) \
   if ( true ) ; \
-  else actorx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::debug).ACTORX_ASSERT_A
+  else actx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::debug).ACTX_ASSERT_A
 
 #endif
 
-# define ACTORX_EXPECTS(expr) \
+# define ACTX_EXPECTS(expr) \
   if ( (expr) ) ; \
-  else actorx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::err, actorx::assert_type::expects).ACTORX_ASSERT_A
+  else actx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::err, actx::assert_type::expects).ACTX_ASSERT_A
 
-# define ACTORX_ENSURES(expr) \
+# define ACTX_ENSURES(expr) \
   if ( (expr) ) ; \
-  else actorx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::err, actorx::assert_type::ensures).ACTORX_ASSERT_A
+  else actx::detail::make_assert(#expr, __FILE__, __LINE__, spdlog::level::err, actx::assert_type::ensures).ACTX_ASSERT_A

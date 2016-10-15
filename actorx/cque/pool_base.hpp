@@ -27,7 +27,7 @@ template <typename T>
 struct pool_make
 {
   static_assert(std::is_base_of<node_base, T>::value, "T must inhert from cque::node_base");
-  gsl::owner<node_base*> operator()() const noexcept
+  gsl::owner<T*> operator()() const noexcept
   {
     return new (std::nothrow) T;
   }
@@ -37,11 +37,11 @@ template <typename T>
 struct pool_delete
 {
   static_assert(std::is_base_of<node_base, T>::value, "T must inhert from cque::node_base");
-  void operator()(gsl::owner<T*> t) const noexcept
+  void operator()(gsl::owner<node_base*> n) const noexcept
   {
-    if (t != nullptr)
+    if (n != nullptr)
     {
-      t->release();
+      n->release();
     }
   }
 };

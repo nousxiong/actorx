@@ -52,7 +52,7 @@ public:
 
 public:
   //! Warn: only call in single-consumer thread.
-  gsl::owner<node_t*> get() noexcept override
+  gsl::owner<T*> get() noexcept override
   {
     auto n = pri_get();
     if (n == nullptr)
@@ -64,7 +64,7 @@ public:
     {
       n->on_get(this);
     }
-    return n;
+    return (T*)n;
   }
 
   bool free(gsl::owner<node_t*> n) noexcept override
@@ -112,7 +112,7 @@ private:
 
   void set_cache(node_t* n) noexcept
   {
-    ACTORX_ASSERTS(cache_ == nullptr);
+    ACTX_ASSERTS(cache_ == nullptr);
     cache_ = n;
   }
 

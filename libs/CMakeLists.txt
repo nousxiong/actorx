@@ -20,18 +20,18 @@ elseif (WIN32)
   endif ()
 endif ()
 
-if (ACTORX_DEV)
+if (ACTX_DEV)
   # Create vc filter
   if (MSVC)
     actorx_source_group(actorx)
   endif ()
 
   # Set up all files.
-  file (GLOB_RECURSE ACTORX_HEADER_FILES ${ACTORX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/actorx/*.hpp")
-  file (GLOB_RECURSE ACTORX_SOURCE_FILES "${PROJECT_SOURCE_DIR}/libs/src/src.cpp")
+  file (GLOB_RECURSE ACTX_HEADER_FILES ${ACTX_HEADER_FILES} "${PROJECT_SOURCE_DIR}/actorx/*.hpp")
+  file (GLOB_RECURSE ACTX_SOURCE_FILES "${PROJECT_SOURCE_DIR}/libs/src/src.cpp")
 
   # Actorx library for dev
-  add_library (actorx STATIC ${ACTORX_SOURCE_FILES} ${ACTORX_HEADER_FILES})
+  add_library (actorx STATIC ${ACTX_SOURCE_FILES} ${ACTX_HEADER_FILES})
 endif ()
 
 # All headers need install include dependences.
@@ -43,7 +43,7 @@ install (
   PATTERN "lua" EXCLUDE
   )
 
-if (ACTORX_INSTALL_DEPENDENCIES)
+if (ACTX_INSTALL_DEPENDENCIES)
   install (
     DIRECTORY ${ASIO_INCLUDE_DIR}/ DESTINATION include
     PATTERN "impl" EXCLUDE
@@ -68,7 +68,15 @@ if (ACTORX_INSTALL_DEPENDENCIES)
     PATTERN "lua" EXCLUDE
     )
 
-  if (ACTORX_HOOK)
+  install (
+    DIRECTORY ${ADATA_INCLUDE_DIR}/ DESTINATION include
+    PATTERN "impl" EXCLUDE
+    PATTERN "CVS" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "lua" EXCLUDE
+    )
+
+  if (ACTX_HOOK)
     install (
       DIRECTORY ${XHOOK_INCLUDE_DIR}/ DESTINATION include
       PATTERN "impl" EXCLUDE
@@ -79,16 +87,16 @@ if (ACTORX_INSTALL_DEPENDENCIES)
   endif ()
 endif ()
 
-if (ACTORX_STATIC)
-  set (ACTORX_LINK_PROPS "${ACTORX_LINK_PROPS} -static -static-libgcc -static-libstdc++")
+if (ACTX_STATIC)
+  set (ACTX_LINK_PROPS "${ACTX_LINK_PROPS} -static -static-libgcc -static-libstdc++")
 endif ()
 
 # Build examples.
-if (ACTORX_BUILD_EXAMPLE)
+if (ACTX_BUILD_EXAMPLE)
   add_subdirectory (example)
 endif ()
 
 # Build tests.
-if (ACTORX_BUILD_TEST)
+if (ACTX_BUILD_TEST)
   add_subdirectory (test)
 endif ()
